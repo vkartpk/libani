@@ -26,7 +26,7 @@ export default function Auth() {
   useEffect(() => { if (user) nav("/", { replace: true }); }, [user, nav]);
 
   const onLogin = async (v: z.infer<typeof loginSchema>) => {
-    const { error } = await supabase.auth.signInWithPassword(v);
+    const { error } = await supabase.auth.signInWithPassword({ email: v.email, password: v.password });
     if (error) toast.error(error.message); else toast.success("Welcome back!");
   };
   const onSignup = async (v: z.infer<typeof signupSchema>) => {
