@@ -4,6 +4,7 @@ import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { supabase } from "@/integrations/supabase/client";
+import { lovable } from "@/integrations/lovable";
 import { useAuth } from "@/contexts/AuthContext";
 import { SEO } from "@/components/SEO";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
@@ -34,6 +35,11 @@ export default function Auth() {
     if (error) toast.error(error.message); else toast.success("Check your email to confirm.");
   };
 
+  const onGoogle = async () => {
+    const res = await lovable.auth.signInWithOAuth("google", { redirect_uri: `${window.location.origin}/` });
+    if (res.error) toast.error(res.error.message);
+  };
+
   return (
     <>
       <SEO title="Sign in | TechZone" />
@@ -45,6 +51,8 @@ export default function Auth() {
           ) : (
           <Tabs value={tab} onValueChange={setTab}>
             <TabsList className="grid grid-cols-2 w-full"><TabsTrigger value="login">Sign in</TabsTrigger><TabsTrigger value="signup">Create account</TabsTrigger></TabsList>
+            <Button type="button" onClick={onGoogle} variant="outline" className="w-full mt-4">Continue with Google</Button>
+            <div className="relative my-4 text-center text-xs text-muted-foreground"><span className="bg-card px-2 relative z-10">or</span><div className="absolute inset-x-0 top-1/2 h-px bg-border" /></div>
             <TabsContent value="login">
               <form onSubmit={li.handleSubmit(onLogin)} className="space-y-3 mt-4">
                 <div><Label>Email</Label><Input type="email" {...li.register("email")} />{li.formState.errors.email && <p className="text-xs text-destructive mt-1">{li.formState.errors.email.message}</p>}</div>
