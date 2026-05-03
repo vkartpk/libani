@@ -1,11 +1,12 @@
 import { Link } from "react-router-dom";
-import { Heart, ShoppingCart, Eye } from "lucide-react";
+import { Heart, ShoppingCart, Eye, BarChart2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import type { Product } from "@/data/types";
 import { formatPKR } from "@/lib/storage";
 import { useCart } from "@/contexts/CartContext";
 import { useWishlist } from "@/contexts/WishlistContext";
+import { useCompare } from "@/contexts/CompareContext";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
@@ -17,6 +18,8 @@ export function ProductCard({ product, onQuickView }: Props) {
   const { add, setDrawerOpen } = useCart();
   const wish = useWishlist();
   const wished = wish.has(product.id);
+  const compare = useCompare();
+  const compared = compare.has(product.id);
 
   const discount =
     product.compareAtPrice && product.compareAtPrice > product.price
@@ -40,6 +43,12 @@ export function ProductCard({ product, onQuickView }: Props) {
     e.stopPropagation();
     const added = wish.toggle(product.id);
     toast(added ? "Added to wishlist ♥" : "Removed from wishlist");
+  };
+
+  const handleCompare = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    compare.toggle(product.id);
   };
 
   return (
@@ -98,11 +107,19 @@ export function ProductCard({ product, onQuickView }: Props) {
           <Heart className={cn("h-4 w-4", wished && "fill-primary text-primary")} />
         </button>
 
+        <button
+          onClick={handleCompare}
+          aria-label={compared ? "Remove from compare" : "Add to compare"}
+          className={cn("absolute top-12 right-2 h-9 w-9 rounded-full bg-background/80 backdrop-blur grid place-items-center hover:bg-primary hover:text-primary-foreground transition-colors", compared && "bg-primary text-primary-foreground")}
+        >
+          <BarChart2 className="h-4 w-4" />
+        </button>
+
         {onQuickView && (
           <button
             onClick={(e) => { e.preventDefault(); e.stopPropagation(); onQuickView(product); }}
             aria-label="Quick view"
-            className="hidden md:grid absolute top-12 right-2 h-9 w-9 rounded-full bg-background/80 backdrop-blur place-items-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-primary hover:text-primary-foreground"
+            className="hidden md:grid absolute top-[5.5rem] right-2 h-9 w-9 rounded-full bg-background/80 backdrop-blur place-items-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-primary hover:text-primary-foreground"
           >
             <Eye className="h-4 w-4" />
           </button>

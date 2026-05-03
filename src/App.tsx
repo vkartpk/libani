@@ -9,6 +9,8 @@ import { CartProvider } from "@/contexts/CartContext";
 import { WishlistProvider } from "@/contexts/WishlistContext";
 import { RecentlyViewedProvider } from "@/contexts/RecentlyViewedContext";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { ThemeProvider } from "@/contexts/ThemeContext";
+import { CompareProvider } from "@/contexts/CompareContext";
 import { Layout } from "@/components/layout/Layout";
 import { ShimmerGrid } from "@/components/ShimmerCard";
 
@@ -29,6 +31,13 @@ const Policy = lazy(() => import("./pages/Policy"));
 const Blog = lazy(() => import("./pages/Blog"));
 const BlogPost = lazy(() => import("./pages/BlogPost"));
 const Auth = lazy(() => import("./pages/Auth"));
+const ResetPassword = lazy(() => import("./pages/ResetPassword"));
+const Compare = lazy(() => import("./pages/Compare"));
+const AccountOverview = lazy(() => import("./pages/account/Overview"));
+const AccountOrders = lazy(() => import("./pages/account/Orders"));
+const AccountAddresses = lazy(() => import("./pages/account/Addresses"));
+const AccountProfile = lazy(() => import("./pages/account/Profile"));
+const AccountSecurity = lazy(() => import("./pages/account/Security"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient();
@@ -36,6 +45,7 @@ const queryClient = new QueryClient();
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <HelmetProvider>
+    <ThemeProvider>
       <TooltipProvider>
         <Toaster />
         <Sonner />
@@ -44,6 +54,7 @@ const App = () => (
             <CartProvider>
               <WishlistProvider>
                 <RecentlyViewedProvider>
+                <CompareProvider>
                   <Layout>
                     <Suspense fallback={<div className="container-x py-8"><ShimmerGrid /></div>}>
                       <Routes>
@@ -57,6 +68,7 @@ const App = () => (
                         <Route path="/cart" element={<Cart />} />
                         <Route path="/checkout" element={<Checkout />} />
                         <Route path="/wishlist" element={<Wishlist />} />
+                        <Route path="/compare" element={<Compare />} />
                         <Route path="/track-order" element={<TrackOrder />} />
                         <Route path="/about" element={<About />} />
                         <Route path="/contact" element={<Contact />} />
@@ -65,17 +77,24 @@ const App = () => (
                         <Route path="/blog" element={<Blog />} />
                         <Route path="/blog/:slug" element={<BlogPost />} />
                         <Route path="/auth" element={<Auth />} />
-                        <Route path="/account" element={<Auth />} />
+                        <Route path="/reset-password" element={<ResetPassword />} />
+                        <Route path="/account" element={<AccountOverview />} />
+                        <Route path="/account/orders" element={<AccountOrders />} />
+                        <Route path="/account/addresses" element={<AccountAddresses />} />
+                        <Route path="/account/profile" element={<AccountProfile />} />
+                        <Route path="/account/security" element={<AccountSecurity />} />
                         <Route path="*" element={<NotFound />} />
                       </Routes>
                     </Suspense>
                   </Layout>
+                </CompareProvider>
                 </RecentlyViewedProvider>
               </WishlistProvider>
             </CartProvider>
           </AuthProvider>
         </BrowserRouter>
       </TooltipProvider>
+    </ThemeProvider>
     </HelmetProvider>
   </QueryClientProvider>
 );
