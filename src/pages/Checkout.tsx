@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -6,12 +6,15 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { SEO } from "@/components/SEO";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { useCart } from "@/contexts/CartContext";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { formatPKR } from "@/lib/storage";
 import { Check } from "lucide-react";
+import { toast } from "sonner";
 
 const schema = z.object({
   fullName: z.string().trim().min(2).max(100),
@@ -30,7 +33,10 @@ export default function Checkout() {
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [pay, setPay] = useState("cod");
   const [orderNo, setOrderNo] = useState("");
-  const { enriched, total, clear, subtotal, shipping, discount } = useCart();
+  const [placing, setPlacing] = useState(false);
+  const [shippingData, setShippingData] = useState<Form | null>(null);
+  const { enriched, total, clear, subtotal, shipping, discount, coupon } = useCart();
+  const { user } = useAuth();
   const nav = useNavigate();
   const { register, handleSubmit, formState: { errors } } = useForm<Form>({ resolver: zodResolver(schema) });
 
@@ -38,8 +44,43 @@ export default function Checkout() {
     return <div className="container-x py-12 text-center"><p>Your cart is empty.</p><Button asChild className="mt-4"><Link to="/products">Shop now</Link></Button></div>;
   }
 
-  const onSubmit = () => setStep(2);
-  const placeOrder = () => { setOrderNo("TZ" + Math.floor(Math.random() * 900000 + 100000)); clear(); setStep(3); };
+  const onSubmit = (data: Form) => { setShippingData(data); setStep(2); };
+
+  const placeOrder = async () => {
+    if (!shippingData) return;
+    setPlacing(true);
+    const generatedNumber = "TZ-" + Math.floor(Math.random() * 900000 + 100000);
+    const { data: order, error } = await supabase.from("orders").insert({
+      user_id: user?.id ?? null,
+      order_number: generatedNumber,
+      email: shippingData.email,
+      phone: shippingData.phone,
+      subtotal, shipping, discount, total,
+      coupon_code: coupon,
+      payment_method: pay,
+      shipping_address: shippingData,
+      status: "placed",
+    }).select().single();
+    if (error || !order) { toast.error(error?.message ?? "Failed to place order"); setPlacing(false); return; }
+
+    const items = enriched.map(({ item, product }) => ({
+      order_id: order.id,
+      product_id: product.id,
+      product_slug: product.slug,
+      product_name: product.name,
+      product_image: product.images[0],
+      variant_label: item.variantId ?? null,
+      unit_price: product.price,
+      quantity: item.qty,
+      line_total: product.price * item.qty,
+    }));
+    await supabase.from("order_items").insert(items);
+
+    setOrderNo(order.order_number);
+    clear();
+    setStep(3);
+    setPlacing(false);
+  };
 
   return (
     <>
@@ -93,7 +134,7 @@ export default function Checkout() {
                 </RadioGroup>
                 <div className="flex gap-2">
                   <Button variant="outline" onClick={() => setStep(1)}>Back</Button>
-                  <Button onClick={placeOrder} className="bg-primary hover:bg-primary/90 text-primary-foreground">Place order</Button>
+                  <Button onClick={placeOrder} disabled={placing} className="bg-primary hover:bg-primary/90 text-primary-foreground">{placing ? "Placing…" : "Place order"}</Button>
                 </div>
               </div>
             )}
