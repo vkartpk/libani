@@ -7,6 +7,7 @@ import { MobileBottomNav } from "./MobileBottomNav";
 import { BackToTop } from "./BackToTop";
 import { CookieConsent } from "./CookieConsent";
 import { CartDrawer } from "@/components/CartDrawer";
+import { CompareBar } from "@/components/CompareBar";
 
 export function Layout({ children }: { children: ReactNode }) {
   const { pathname } = useLocation();
@@ -22,6 +23,7 @@ export function Layout({ children }: { children: ReactNode }) {
       <BackToTop />
       <CookieConsent />
       <CartDrawer />
+      <CompareBar />
     </div>
   );
 }
