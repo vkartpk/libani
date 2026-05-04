@@ -1,119 +1,99 @@
-# TechZone — Phase 2 Build
 
-Phase 1 shipped the storefront, content pages, and real auth. Phase 2 adds the deferred items: a full account dashboard backed by real orders, product compare, and a dark/light theme toggle.
+# TechZone — Phase 3 Build
+
+Phase 3 closes out the storefront with three deferred items: move the product catalog into the database, ship a role-gated admin dashboard, and send real branded emails for orders and account events.
 
 ---
 
 ## Scope
 
-1. **Account dashboard** at `/account` (replaces the current `/account → /auth` redirect for signed-in users)
-2. **Real order persistence** — checkout writes to the database; orders show up in the account dashboard and Track Order
-3. **Product compare** — pick up to 4 products, compare side-by-side
-4. **Dark / light theme toggle** in the header, persisted per user
+1. **Catalog in the database** — `categories`, `brands`, `products`, `product_variants`
+2. **Roles + admin dashboard** at `/admin` — orders, products, categories, customers
+3. **Branded auth + transactional emails** — order placed, status updates, contact form ack, custom password reset / verification
 
 ---
 
-## 1. Account dashboard
+## 1. Catalog migration
 
-Route: `/account` (protected — redirects to `/auth` if signed out).
+New tables (RLS: public `SELECT` on active rows; admin-only `INSERT/UPDATE/DELETE`):
 
-Layout: left sidebar nav + right content panel (uses shadcn `Sidebar`). On mobile, sidebar collapses to a top tab bar.
+`categories` — `id`, `slug` (unique), `name`, `description`, `image_url`, `parent_slug`, `sort_order`, `is_active`
+`brands` — `id`, `slug` (unique), `name`, `logo_url`, `description`, `is_active`
+`products` — `id`, `slug` (unique), `name`, `brand_slug`, `category_slug`, `subcategory_slug`, `price`, `compare_at_price`, `description`, `features` (jsonb array), `specs` (jsonb), `tags` (text[]), `images` (text[]), `is_featured`, `is_new_arrival`, `is_on_sale`, `in_stock`, `rating`, `review_count`, `created_at`
+`product_variants` — `id`, `product_id` fk, `label`, `type` (color|storage|size), `value`, `in_stock`, `sort_order`
 
-Tabs / sections:
-- **Overview** — greeting, recent order, wishlist count, quick links
-- **Orders** — table of orders (number, date, total, status, items count) with row → order detail drawer (line items, address, payment method, status timeline)
-- **Profile** — edit name, phone, avatar (avatar upload to a `avatars` storage bucket)
-- **Addresses** — list + add/edit/delete saved shipping addresses (used to prefill checkout)
-- **Security** — change password (`supabase.auth.updateUser({ password })`), sign out everywhere
+**Seeding**: one-time SQL migration that inserts every row currently in `src/data/products.ts`, `categories.ts`, `brands.ts` (generated from a script — not hand-typed). After seeding, `src/data/*.ts` is removed and replaced with `src/data/queries.ts` exposing typed `useProducts`, `useProduct(slug)`, `useCategories`, `useBrands` hooks built on TanStack Query + Supabase.
 
-Header account icon: when signed in, opens a dropdown with links to Overview / Orders / Wishlist / Sign out instead of going straight to `/auth`.
+**All consumer pages migrate**: Home (FlashSale, WeeklyPicks, FeaturedSpotlight, BrandStrip, CategoryShowcase), Products list, ProductDetail, CategoryPage, BrandPage, SearchPage, Wishlist, Compare, Cart, Checkout. The existing `Product` shape stays the same so component code barely changes — only the data source.
 
----
-
-## 2. Real order persistence
-
-New tables (with RLS — users only see their own):
-
-`orders`
-```
-id uuid pk
-user_id uuid (nullable — guest checkout allowed)
-order_number text unique  -- TZ-XXXXXX
-email text
-phone text
-subtotal numeric, shipping numeric, discount numeric, total numeric
-coupon_code text
-payment_method text  -- cod | bank | jazzcash | easypaisa
-shipping_address jsonb
-status text default 'placed'  -- placed | processing | shipped | out_for_delivery | delivered | cancelled
-created_at, updated_at
-```
-
-`order_items`
-```
-id uuid pk
-order_id uuid fk → orders
-product_id text, product_slug text, product_name text, product_image text
-variant_label text
-unit_price numeric, quantity int, line_total numeric
-```
-
-`addresses`
-```
-id uuid pk
-user_id uuid fk → auth.users
-label text  -- Home / Office / etc.
-full_name text, phone text
-line1, line2, city, province, postal_code text
-is_default bool
-created_at
-```
-
-RLS:
-- `orders`: insert allowed for `auth.uid() = user_id` OR `user_id IS NULL` (guest); select/update only own rows
-- `order_items`: select/insert via parent order ownership
-- `addresses`: full CRUD on own rows
-
-Checkout step 3 now actually inserts the order + items, returns the real `order_number`. Track Order page queries by `order_number` + email/phone.
-
-Storage bucket `avatars` (public read, owner-only write) for profile avatars.
+Cart/Wishlist/Compare keep storing minimal `{id, slug, name, image, price, variant}` snapshots in localStorage so they survive product edits.
 
 ---
 
-## 3. Product compare
+## 2. Roles + admin dashboard
 
-- Compare button on `ProductCard` and product detail page (heart-style icon next to wishlist)
-- `CompareContext` (localStorage) — max 4 products, toast when full
-- Floating compare bar appears bottom-right when 1+ items selected, with thumbnails and "Compare (n)" CTA
-- `/compare` page: side-by-side table — image, name, price, rating, brand, key specs (extracted from `product.specs`), in-stock, add-to-cart per column, remove column button
-- Mobile: horizontal scroll with sticky first column (attribute names)
+**Roles** (per the user-roles best practice — separate table + `has_role` security definer):
+
+```
+type app_role enum ('admin','customer')
+table user_roles (id, user_id fk auth.users, role app_role, unique(user_id, role))
+function public.has_role(_user_id uuid, _role app_role) returns boolean security definer
+function public.is_admin() returns boolean -> has_role(auth.uid(),'admin')
+```
+
+`handle_new_user` trigger also inserts `('customer')` for every new signup. Admin promotion is done manually via the Cloud DB tools — no UI to self-promote.
+
+RLS on the new catalog tables uses `is_admin()` for write access; public can `SELECT` where `is_active = true`. Existing `orders` / `order_items` / `addresses` policies get an additional `admin can select all` policy gated on `is_admin()`.
+
+**Route**: `/admin/*` protected — redirects to `/` if `!is_admin()`. Sidebar layout (mirrors AccountLayout) with sections:
+
+- **Dashboard** — KPI cards (orders today, revenue 30d, low stock, new customers), recent orders table, top products
+- **Orders** — paginated table with status filter; row drawer mirrors customer order detail plus a status dropdown (placed → processing → shipped → out_for_delivery → delivered → cancelled). Saving status triggers an email (see §3).
+- **Products** — table with search + filters; create/edit dialog (name, slug auto, brand, category, price, compare-at, description, features list, specs k/v, image URLs, flags, in-stock toggle); variant subgrid; bulk delete; CSV export
+- **Categories** — list + add/edit/reorder (drag handle updates `sort_order`); soft-delete via `is_active`
+- **Brands** — same pattern as categories
+- **Customers** — paginated list joining `auth.users` (via a SECURITY DEFINER `admin_list_users()` RPC) with `profiles` and order count/total; row drawer shows profile, addresses, orders, and a "Make admin / Remove admin" toggle
+
+Header: when `is_admin()`, the account dropdown gets an "Admin dashboard" link.
 
 ---
 
-## 4. Dark / light theme toggle
+## 3. Email notifications
 
-- `ThemeContext` reads from `localStorage` (`techzone-theme`) with `prefers-color-scheme` fallback
-- Adds/removes `light` class on `<html>`; existing tokens already use HSL semantic vars — add a `:root.light { ... }` block to `src/index.css` with the light palette (white bg, near-black fg, same red primary, lighter borders/cards)
-- Toggle button (sun/moon icon) in header secondary nav, also surfaced in account → Profile
-- All existing components keep using semantic tokens — no per-component changes needed
+**Domain + infra**: prompts the user to set up an email sender domain (one-click dialog), then Lovable Cloud handles auth+transactional infrastructure automatically.
+
+**Auth emails** (custom branded templates via the auth-email-hook):
+- Signup verification, password reset, magic link, email change, reauthentication, invite — all 6 templates restyled to match TechZone (red `#E11D48` primary, dark headings, white body, footer with brand mark)
+
+**Transactional templates** (registered in the transactional registry):
+- `order-placed` — sent from Checkout right after the `orders` insert. Subject: `Order TZ-XXXXXX confirmed`. Body: thanks, order summary table, shipping address, total, "Track order" button → `/track-order?number=...`
+- `order-status-update` — sent from the admin Orders status dropdown. Subject and body adapt to status (`processing`, `shipped`, `out_for_delivery`, `delivered`, `cancelled`); `delivered` adds a "leave a review" CTA back to the product
+- `contact-form` — sent when the Contact page form is submitted. Goes to the submitter (ack) only — no admin-side bulk send
+
+Idempotency keys derived from `order.id + status` and `contact_submission.id` so retries are safe.
+
+A new `contact_submissions` table (`id, name, email, subject, message, created_at`) is added to support the contact-form trigger and let admins read submissions in the Customers area later.
 
 ---
 
 ## Build order
 
-1. Migrations: `orders`, `order_items`, `addresses` tables + RLS + `avatars` bucket
-2. `ThemeContext` + light palette in `index.css` + header toggle
-3. `CompareContext` + ProductCard compare button + floating bar + `/compare` page
-4. `AccountLayout` (protected route + sidebar) and tab pages: Overview, Orders, Profile, Addresses, Security
-5. Hook checkout into `orders`/`order_items` insert; address-step uses saved addresses dropdown
-6. Track Order page: replace mock with real query
-7. Header account dropdown when signed in
-8. QA: 375px mobile pass, light-mode pass on every page, end-to-end order flow as guest + signed-in
+1. Migration: `categories`, `brands`, `products`, `product_variants` tables + RLS + admin write policies; seed all current data
+2. Migration: `app_role` enum, `user_roles`, `has_role`, `is_admin`, `admin_list_users` RPC; update `handle_new_user` to also insert `customer` role; admin SELECT policies on `orders`/`order_items`/`addresses`
+3. Migration: `contact_submissions` table + RLS (insert anyone, select admin)
+4. `src/data/queries.ts` + delete `products.ts`/`categories.ts`/`brands.ts`; update every consumer to use the new hooks; add lightweight loading skeletons where the data is now async
+5. `useUserRole` hook + protected `/admin` route + `AdminLayout`
+6. Admin pages in order: Orders → Products → Categories → Brands → Customers → Dashboard
+7. Wire up email sender domain dialog; once set, scaffold auth email templates (branded), scaffold transactional infra
+8. Create `order-placed`, `order-status-update`, `contact-form` templates + register them
+9. Invoke `send-transactional-email` from Checkout (order-placed), Admin Orders status save (order-status-update), Contact form (contact-form + insert into `contact_submissions`)
+10. QA: end-to-end as guest + signed-in customer + admin; verify emails arrive (test mode); responsive pass at 375px on every admin page
 
 ---
 
-## Notes
+## Notes / non-goals
 
-- No new external deps needed — all UI uses existing shadcn components
-- Guest checkout still works; orders without `user_id` are accessible only via order_number + email match on Track Order
-- Existing `profiles` table is reused for name/phone/avatar; no schema change there beyond `avatar_url` (already present)
+- Reviews/ratings stay deferred — admin dashboard already lets us edit `rating`/`review_count` manually; a real review system is a Phase 4 candidate
+- Real payment processing stays deferred — payment_method options unchanged
+- Image uploads for products use URL fields (admin pastes URLs); a Storage-backed product image uploader is a follow-up
+- Customer self-promotion to admin is intentionally not possible; first admin must be assigned via the database tool
