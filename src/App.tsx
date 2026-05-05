@@ -39,6 +39,12 @@ const AccountAddresses = lazy(() => import("./pages/account/Addresses"));
 const AccountProfile = lazy(() => import("./pages/account/Profile"));
 const AccountSecurity = lazy(() => import("./pages/account/Security"));
 const NotFound = lazy(() => import("./pages/NotFound"));
+const AdminDashboard = lazy(() => import("./pages/admin/Dashboard"));
+const AdminOrders = lazy(() => import("./pages/admin/Orders"));
+const AdminProducts = lazy(() => import("./pages/admin/Products"));
+const AdminCategories = lazy(() => import("./pages/admin/Categories"));
+const AdminBrands = lazy(() => import("./pages/admin/Brands"));
+const AdminCustomers = lazy(() => import("./pages/admin/Customers"));
 
 const queryClient = new QueryClient();
 
@@ -83,6 +89,12 @@ const App = () => (
                         <Route path="/account/addresses" element={<AccountAddresses />} />
                         <Route path="/account/profile" element={<AccountProfile />} />
                         <Route path="/account/security" element={<AccountSecurity />} />
+                        <Route path="/admin" element={<AdminDashboard />} />
+                        <Route path="/admin/orders" element={<AdminOrders />} />
+                        <Route path="/admin/products" element={<AdminProducts />} />
+                        <Route path="/admin/categories" element={<AdminCategories />} />
+                        <Route path="/admin/brands" element={<AdminBrands />} />
+                        <Route path="/admin/customers" element={<AdminCustomers />} />
                         <Route path="*" element={<NotFound />} />
                       </Routes>
                     </Suspense>
