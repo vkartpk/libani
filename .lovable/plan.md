@@ -1,99 +1,68 @@
+# Phase 3 Implementation
 
-# TechZone — Phase 3 Build
+The Phase 3 scaffolding from earlier was partial: admin page files exist but the database tables they query (`products`, `user_roles`, `categories`, `brands`) do not, the `/admin` routes aren't wired in `App.tsx`, the header has no admin link, and emails aren't set up. This plan ships all three Phase 3 pillars end-to-end.
 
-Phase 3 closes out the storefront with three deferred items: move the product catalog into the database, ship a role-gated admin dashboard, and send real branded emails for orders and account events.
+## 1. Database — catalog + roles + contact
 
----
+Single migration creating:
 
-## Scope
+- `app_role` enum (`admin`, `customer`)
+- `user_roles` table + `has_role(uuid, app_role)` and `is_admin()` security-definer functions (the canonical no-recursion pattern)
+- Update `handle_new_user` trigger to also insert a `customer` role for every signup
+- `categories` (slug PK, name, description, image_url, parent_slug, sort_order, is_active)
+- `brands` (slug PK, name, logo_url, description, is_active)
+- `products` (id, slug unique, name, brand_slug, category_slug, subcategory_slug, price, compare_at_price, description, features jsonb, specs jsonb, tags text[], images text[], rating, review_count, in_stock, stock_count, is_featured, is_new_arrival, is_on_sale, sku, free_shipping, created_at)
+- `product_variants` (id, product_id fk, label, type, value, in_stock, sort_order)
+- `contact_submissions` (id, name, email, subject, message, created_at)
+- RLS: public `SELECT` on active catalog rows, `is_admin()` for write; admin SELECT-all policies added to `orders`, `order_items`, `addresses`, `profiles`, `contact_submissions`; anyone can INSERT to `contact_submissions`
 
-1. **Catalog in the database** — `categories`, `brands`, `products`, `product_variants`
-2. **Roles + admin dashboard** at `/admin` — orders, products, categories, customers
-3. **Branded auth + transactional emails** — order placed, status updates, contact form ack, custom password reset / verification
+Seed step: a separate insert-only migration generated from the current `src/data/products.ts`, `categories.ts`, `brands.ts` so all existing catalog content is preserved.
 
----
+## 2. Storefront → DB-backed catalog
 
-## 1. Catalog migration
+Add `src/data/queries.ts` exposing `useProducts`, `useProduct(slug)`, `useCategories`, `useCategory(slug)`, `useBrands`, `useBrand(slug)` built on TanStack Query + Supabase, returning the same `Product`/`Brand`/`Category` shapes the components already use. Migrate every consumer:
 
-New tables (RLS: public `SELECT` on active rows; admin-only `INSERT/UPDATE/DELETE`):
+- Home widgets (FlashSale, WeeklyPicks, FeaturedSpotlight, BrandStrip, CategoryShowcase)
+- Products list, ProductDetail, CategoryPage, BrandPage, SearchPage
+- Wishlist, Compare (already store snapshots; just resolve missing items via query)
 
-`categories` — `id`, `slug` (unique), `name`, `description`, `image_url`, `parent_slug`, `sort_order`, `is_active`
-`brands` — `id`, `slug` (unique), `name`, `logo_url`, `description`, `is_active`
-`products` — `id`, `slug` (unique), `name`, `brand_slug`, `category_slug`, `subcategory_slug`, `price`, `compare_at_price`, `description`, `features` (jsonb array), `specs` (jsonb), `tags` (text[]), `images` (text[]), `is_featured`, `is_new_arrival`, `is_on_sale`, `in_stock`, `rating`, `review_count`, `created_at`
-`product_variants` — `id`, `product_id` fk, `label`, `type` (color|storage|size), `value`, `in_stock`, `sort_order`
+Keep `src/data/types.ts`. Remove `src/data/products.ts`, `categories.ts`, `brands.ts` once all consumers are switched. Add lightweight skeletons where data becomes async.
 
-**Seeding**: one-time SQL migration that inserts every row currently in `src/data/products.ts`, `categories.ts`, `brands.ts` (generated from a script — not hand-typed). After seeding, `src/data/*.ts` is removed and replaced with `src/data/queries.ts` exposing typed `useProducts`, `useProduct(slug)`, `useCategories`, `useBrands` hooks built on TanStack Query + Supabase.
+## 3. Roles + /admin dashboard
 
-**All consumer pages migrate**: Home (FlashSale, WeeklyPicks, FeaturedSpotlight, BrandStrip, CategoryShowcase), Products list, ProductDetail, CategoryPage, BrandPage, SearchPage, Wishlist, Compare, Cart, Checkout. The existing `Product` shape stays the same so component code barely changes — only the data source.
+- `useUserRole` hook (already exists) — keep
+- Add `/admin/*` routes to `App.tsx`, lazy-loaded
+- Wire existing `AdminLayout`, `Dashboard`, `Orders`, `Products`
+- Add missing admin pages: **Categories**, **Brands**, **Customers** (joins `profiles` + order count via a `admin_list_customers()` RPC; per-user "Make admin / Remove admin" toggle that inserts/deletes from `user_roles`)
+- Add an "Admin dashboard" link in the header account dropdown when `useUserRole().isAdmin` is true
 
-Cart/Wishlist/Compare keep storing minimal `{id, slug, name, image, price, variant}` snapshots in localStorage so they survive product edits.
+First admin promotion: documented manual step (insert into `user_roles` via the database tool with the current user's id) — no self-promote UI.
 
----
+## 4. Branded emails
 
-## 2. Roles + admin dashboard
-
-**Roles** (per the user-roles best practice — separate table + `has_role` security definer):
-
-```
-type app_role enum ('admin','customer')
-table user_roles (id, user_id fk auth.users, role app_role, unique(user_id, role))
-function public.has_role(_user_id uuid, _role app_role) returns boolean security definer
-function public.is_admin() returns boolean -> has_role(auth.uid(),'admin')
-```
-
-`handle_new_user` trigger also inserts `('customer')` for every new signup. Admin promotion is done manually via the Cloud DB tools — no UI to self-promote.
-
-RLS on the new catalog tables uses `is_admin()` for write access; public can `SELECT` where `is_active = true`. Existing `orders` / `order_items` / `addresses` policies get an additional `admin can select all` policy gated on `is_admin()`.
-
-**Route**: `/admin/*` protected — redirects to `/` if `!is_admin()`. Sidebar layout (mirrors AccountLayout) with sections:
-
-- **Dashboard** — KPI cards (orders today, revenue 30d, low stock, new customers), recent orders table, top products
-- **Orders** — paginated table with status filter; row drawer mirrors customer order detail plus a status dropdown (placed → processing → shipped → out_for_delivery → delivered → cancelled). Saving status triggers an email (see §3).
-- **Products** — table with search + filters; create/edit dialog (name, slug auto, brand, category, price, compare-at, description, features list, specs k/v, image URLs, flags, in-stock toggle); variant subgrid; bulk delete; CSV export
-- **Categories** — list + add/edit/reorder (drag handle updates `sort_order`); soft-delete via `is_active`
-- **Brands** — same pattern as categories
-- **Customers** — paginated list joining `auth.users` (via a SECURITY DEFINER `admin_list_users()` RPC) with `profiles` and order count/total; row drawer shows profile, addresses, orders, and a "Make admin / Remove admin" toggle
-
-Header: when `is_admin()`, the account dropdown gets an "Admin dashboard" link.
-
----
-
-## 3. Email notifications
-
-**Domain + infra**: prompts the user to set up an email sender domain (one-click dialog), then Lovable Cloud handles auth+transactional infrastructure automatically.
-
-**Auth emails** (custom branded templates via the auth-email-hook):
-- Signup verification, password reset, magic link, email change, reauthentication, invite — all 6 templates restyled to match TechZone (red `#E11D48` primary, dark headings, white body, footer with brand mark)
-
-**Transactional templates** (registered in the transactional registry):
-- `order-placed` — sent from Checkout right after the `orders` insert. Subject: `Order TZ-XXXXXX confirmed`. Body: thanks, order summary table, shipping address, total, "Track order" button → `/track-order?number=...`
-- `order-status-update` — sent from the admin Orders status dropdown. Subject and body adapt to status (`processing`, `shipped`, `out_for_delivery`, `delivered`, `cancelled`); `delivered` adds a "leave a review" CTA back to the product
-- `contact-form` — sent when the Contact page form is submitted. Goes to the submitter (ack) only — no admin-side bulk send
-
-Idempotency keys derived from `order.id + status` and `contact_submission.id` so retries are safe.
-
-A new `contact_submissions` table (`id, name, email, subject, message, created_at`) is added to support the contact-form trigger and let admins read submissions in the Customers area later.
-
----
+- Trigger the email-domain setup dialog so the user can configure their sender domain
+- Set up the shared email infrastructure
+- Scaffold + brand all 6 auth email templates (red `#E11D48` primary, white body, TechZone footer)
+- Scaffold transactional infra and add three templates registered in `registry.ts`:
+  - `order-placed` — invoked from `Checkout.tsx` after the order insert; subject `Order TZ-XXXXXX confirmed`; includes summary, address, total, "Track order" button
+  - `order-status-update` — invoked from the admin Orders status-change handler; copy adapts per status; `delivered` adds a review CTA
+  - `contact-form` — invoked from `Contact.tsx` after inserting into `contact_submissions`; sends acknowledgement to the submitter
+- Idempotency keys: `order-placed-{order.id}`, `order-status-{order.id}-{status}`, `contact-{submission.id}`
 
 ## Build order
 
-1. Migration: `categories`, `brands`, `products`, `product_variants` tables + RLS + admin write policies; seed all current data
-2. Migration: `app_role` enum, `user_roles`, `has_role`, `is_admin`, `admin_list_users` RPC; update `handle_new_user` to also insert `customer` role; admin SELECT policies on `orders`/`order_items`/`addresses`
-3. Migration: `contact_submissions` table + RLS (insert anyone, select admin)
-4. `src/data/queries.ts` + delete `products.ts`/`categories.ts`/`brands.ts`; update every consumer to use the new hooks; add lightweight loading skeletons where the data is now async
-5. `useUserRole` hook + protected `/admin` route + `AdminLayout`
-6. Admin pages in order: Orders → Products → Categories → Brands → Customers → Dashboard
-7. Wire up email sender domain dialog; once set, scaffold auth email templates (branded), scaffold transactional infra
-8. Create `order-placed`, `order-status-update`, `contact-form` templates + register them
-9. Invoke `send-transactional-email` from Checkout (order-placed), Admin Orders status save (order-status-update), Contact form (contact-form + insert into `contact_submissions`)
-10. QA: end-to-end as guest + signed-in customer + admin; verify emails arrive (test mode); responsive pass at 375px on every admin page
+1. Migration: roles + has_role/is_admin + handle_new_user update + admin SELECT policies on existing tables
+2. Migration: catalog tables + RLS + `contact_submissions` + `admin_list_customers()` RPC
+3. Seed migration generated from current `src/data/*.ts`
+4. `src/data/queries.ts` + migrate all storefront consumers + remove old data files
+5. Wire `/admin/*` routes in `App.tsx`; add header admin link; build Categories / Brands / Customers admin pages
+6. Email domain setup dialog → infra → branded auth templates → transactional templates
+7. Wire transactional sends in Checkout, admin Orders, Contact form
+8. QA pass: guest checkout email, signed-in checkout email, admin status-change email, contact ack, admin pages at 375px, role gating
 
----
+## Non-goals
 
-## Notes / non-goals
-
-- Reviews/ratings stay deferred — admin dashboard already lets us edit `rating`/`review_count` manually; a real review system is a Phase 4 candidate
-- Real payment processing stays deferred — payment_method options unchanged
-- Image uploads for products use URL fields (admin pastes URLs); a Storage-backed product image uploader is a follow-up
-- Customer self-promotion to admin is intentionally not possible; first admin must be assigned via the database tool
+- No product image uploads (URL fields only — Storage uploader is Phase 4)
+- No review system (admin can edit `rating`/`review_count` directly)
+- No payment processing changes
+- No self-serve admin promotion
