@@ -1,11 +1,13 @@
 import { Link, NavLink } from "react-router-dom";
-import { Heart, Search, ShoppingCart, User, Menu, Zap, Phone, Mail, ChevronDown } from "lucide-react";
+import { Heart, Search, ShoppingCart, User, Menu, Zap, Phone, Mail, ChevronDown, LayoutDashboard, LogOut, UserCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { useCart } from "@/contexts/CartContext";
 import { useWishlist } from "@/contexts/WishlistContext";
 import { useAuth } from "@/contexts/AuthContext";
+import { useUserRole } from "@/hooks/useUserRole";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useState } from "react";
 import { SearchOverlay } from "@/components/SearchOverlay";
 import { categories, gamingCategories } from "@/data/categories";
@@ -28,7 +30,8 @@ function MegaMenuTrigger({ label, children }: { label: string; children: React.R
 export function Header() {
   const { count, setDrawerOpen } = useCart();
   const { count: wishCount } = useWishlist();
-  const { user } = useAuth();
+  const { user, signOut } = useAuth();
+  const { isAdmin } = useUserRole();
   const [searchOpen, setSearchOpen] = useState(false);
 
   const mainCats = categories.filter((c) => c.group === "main");
@@ -180,11 +183,31 @@ export function Header() {
                 {wishCount > 0 && <span className="absolute -top-0.5 -right-0.5 h-4 min-w-4 px-1 grid place-items-center text-[10px] font-bold rounded-full bg-primary text-primary-foreground">{wishCount}</span>}
               </Link>
             </Button>
-            <Button asChild size="icon" variant="ghost" aria-label="Account">
-              <Link to={user ? "/wishlist" : "/auth"}>
-                <User className="h-5 w-5" />
-              </Link>
-            </Button>
+            {user ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button size="icon" variant="ghost" aria-label="Account">
+                    <User className="h-5 w-5" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48">
+                  <DropdownMenuItem asChild><Link to="/account"><UserCircle className="h-4 w-4 mr-2" /> My Account</Link></DropdownMenuItem>
+                  <DropdownMenuItem asChild><Link to="/account/orders">Orders</Link></DropdownMenuItem>
+                  {isAdmin && (
+                    <>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem asChild><Link to="/admin"><LayoutDashboard className="h-4 w-4 mr-2" /> Admin Dashboard</Link></DropdownMenuItem>
+                    </>
+                  )}
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => signOut()}><LogOut className="h-4 w-4 mr-2" /> Sign out</DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <Button asChild size="icon" variant="ghost" aria-label="Account">
+                <Link to="/auth"><User className="h-5 w-5" /></Link>
+              </Button>
+            )}
             <Button size="icon" variant="ghost" onClick={() => setDrawerOpen(true)} className="relative" aria-label="Cart">
               <ShoppingCart className="h-5 w-5" />
               {count > 0 && <span className="absolute -top-0.5 -right-0.5 h-4 min-w-4 px-1 grid place-items-center text-[10px] font-bold rounded-full bg-primary text-primary-foreground">{count}</span>}
