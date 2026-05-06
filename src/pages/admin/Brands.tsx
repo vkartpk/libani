@@ -10,6 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Plus, Pencil, Trash2 } from "lucide-react";
 import { toast } from "sonner";
+import { SingleImageUploader } from "@/components/admin/ImageUploader";
 
 export default function AdminBrands() {
   const [list, setList] = useState<any[]>([]);
@@ -95,8 +96,8 @@ function BrandDialog({ editing, onClose, onSaved }: { editing: any; onClose: () 
           <div><Label>Name</Label><Input value={form.name || ""} onChange={(e) => set("name", e.target.value)} /></div>
           <div><Label>Slug</Label><Input value={form.slug || ""} onChange={(e) => set("slug", e.target.value)} disabled={!isNew} /></div>
           <div><Label>Description</Label><Textarea value={form.description || ""} onChange={(e) => set("description", e.target.value)} rows={2} /></div>
-          <div><Label>Logo URL</Label><Input value={form.logo_url || ""} onChange={(e) => set("logo_url", e.target.value)} /></div>
-          <div><Label>Banner URL</Label><Input value={form.banner_url || ""} onChange={(e) => set("banner_url", e.target.value)} /></div>
+          <div><Label>Logo</Label><SingleImageUploader value={form.logo_url} onChange={(u) => set("logo_url", u)} folder="brands" /></div>
+          <div><Label>Banner</Label><SingleImageUploader value={form.banner_url} onChange={(u) => set("banner_url", u)} folder="brands" /></div>
           <div className="flex items-center gap-2"><Switch checked={form.is_active ?? true} onCheckedChange={(v) => set("is_active", v)} /><Label>Active</Label></div>
         </div>
         <DialogFooter><Button variant="outline" onClick={onClose}>Cancel</Button><Button onClick={save}>Save</Button></DialogFooter>

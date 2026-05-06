@@ -9,6 +9,7 @@ import { Switch } from "@/components/ui/switch";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Plus, Pencil, Trash2 } from "lucide-react";
 import { toast } from "sonner";
+import { SingleImageUploader } from "@/components/admin/ImageUploader";
 
 export default function AdminCategories() {
   const [list, setList] = useState<any[]>([]);
@@ -96,7 +97,7 @@ function CategoryDialog({ editing, onClose, onSaved }: { editing: any; onClose: 
           <div><Label>Name</Label><Input value={form.name || ""} onChange={(e) => set("name", e.target.value)} /></div>
           <div><Label>Slug</Label><Input value={form.slug || ""} onChange={(e) => set("slug", e.target.value)} disabled={!isNew} /></div>
           <div><Label>Group</Label><Input value={form.group_name || ""} onChange={(e) => set("group_name", e.target.value)} placeholder="main / peripherals / extra" /></div>
-          <div><Label>Image URL</Label><Input value={form.image_url || ""} onChange={(e) => set("image_url", e.target.value)} /></div>
+          <div><Label>Image</Label><SingleImageUploader value={form.image_url} onChange={(u) => set("image_url", u)} folder="categories" /></div>
           <div><Label>Sort order</Label><Input type="number" value={form.sort_order ?? 0} onChange={(e) => set("sort_order", e.target.value)} /></div>
           <div className="flex items-center gap-2"><Switch checked={form.is_active ?? true} onCheckedChange={(v) => set("is_active", v)} /><Label>Active</Label></div>
         </div>
