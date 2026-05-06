@@ -10,6 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Plus, Pencil, Trash2 } from "lucide-react";
 import { toast } from "sonner";
+import { ImageUploader } from "@/components/admin/ImageUploader";
 
 type Product = any;
 
@@ -108,7 +109,7 @@ function ProductDialog({ editing, onClose, onSaved }: { editing: Product | null;
       is_featured: !!form.is_featured,
       is_new_arrival: !!form.is_new_arrival,
       is_on_sale: !!form.is_on_sale,
-      images: form.images_text ? form.images_text.split("\n").map((s: string) => s.trim()).filter(Boolean) : (form.images || []),
+      images: form.images || [],
     };
     if (!payload.name || !payload.brand_slug || !payload.category_slug || !payload.price) {
       return toast.error("Name, brand, category and price are required");
@@ -143,8 +144,8 @@ function ProductDialog({ editing, onClose, onSaved }: { editing: Product | null;
             <Textarea value={form.description || ""} onChange={(e) => set("description", e.target.value)} rows={3} />
           </div>
           <div>
-            <Label>Image URLs (one per line)</Label>
-            <Textarea value={form.images_text ?? (form.images || []).join("\n")} onChange={(e) => set("images_text", e.target.value)} rows={3} />
+            <Label>Product Images</Label>
+            <ImageUploader value={form.images || []} onChange={(urls) => set("images", urls)} folder="products" />
           </div>
           <div className="flex gap-4 flex-wrap">
             <div className="flex items-center gap-2"><Switch checked={!!form.is_featured} onCheckedChange={(v) => set("is_featured", v)} /><Label>Featured</Label></div>
