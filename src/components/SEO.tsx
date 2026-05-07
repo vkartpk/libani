@@ -7,12 +7,24 @@ type Props = {
   type?: "website" | "product" | "article";
   canonical?: string;
   jsonLd?: object | object[];
+  faq?: { q: string; a: string }[];
 };
 
-export function SEO({ title, description, image, type = "website", canonical, jsonLd }: Props) {
+export function SEO({ title, description, image, type = "website", canonical, jsonLd, faq }: Props) {
   const url = canonical ?? (typeof window !== "undefined" ? window.location.href : "");
   const ogImage = image ?? "https://lovable.dev/opengraph-image-p98pqg.png";
   const ldArray = Array.isArray(jsonLd) ? jsonLd : jsonLd ? [jsonLd] : [];
+  if (faq && faq.length) {
+    ldArray.push({
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      mainEntity: faq.map((f) => ({
+        "@type": "Question",
+        name: f.q,
+        acceptedAnswer: { "@type": "Answer", text: f.a },
+      })),
+    });
+  }
   return (
     <Helmet>
       <title>{title}</title>

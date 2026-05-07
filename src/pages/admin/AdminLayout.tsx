@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 import { Navigate, NavLink, useLocation } from "react-router-dom";
-import { LayoutDashboard, ShoppingBag, Package, Tags, Building2, Users, ArrowLeft } from "lucide-react";
+import { LayoutDashboard, ShoppingBag, Package, Tags, Building2, Users, ArrowLeft, Sparkles } from "lucide-react";
 import { useUserRole } from "@/hooks/useUserRole";
 import { useAuth } from "@/contexts/AuthContext";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -13,6 +13,7 @@ const items = [
   { to: "/admin/categories", label: "Categories", icon: Tags },
   { to: "/admin/brands", label: "Brands", icon: Building2 },
   { to: "/admin/customers", label: "Customers", icon: Users },
+  { to: "/admin/seo", label: "SEO / AEO / GEO", icon: Sparkles },
 ];
 
 export function AdminLayout({ children, title }: { children: ReactNode; title: string }) {
