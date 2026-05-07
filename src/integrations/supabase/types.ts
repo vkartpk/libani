@@ -325,6 +325,9 @@ export type Database = {
           price: number
           rating: number
           review_count: number
+          seo_faq: Json
+          seo_keywords: string[]
+          seo_updated_at: string | null
           sku: string | null
           slug: string
           specs: Json
@@ -355,6 +358,9 @@ export type Database = {
           price?: number
           rating?: number
           review_count?: number
+          seo_faq?: Json
+          seo_keywords?: string[]
+          seo_updated_at?: string | null
           sku?: string | null
           slug: string
           specs?: Json
@@ -385,6 +391,9 @@ export type Database = {
           price?: number
           rating?: number
           review_count?: number
+          seo_faq?: Json
+          seo_keywords?: string[]
+          seo_updated_at?: string | null
           sku?: string | null
           slug?: string
           specs?: Json
@@ -423,6 +432,45 @@ export type Database = {
           phone?: string | null
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      site_settings: {
+        Row: {
+          created_at: string
+          default_og_image: string | null
+          description_template: string
+          id: string
+          local_business_json_ld: Json
+          org_json_ld: Json
+          singleton: boolean
+          site_name: string
+          title_template: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          default_og_image?: string | null
+          description_template?: string
+          id?: string
+          local_business_json_ld?: Json
+          org_json_ld?: Json
+          singleton?: boolean
+          site_name?: string
+          title_template?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          default_og_image?: string | null
+          description_template?: string
+          id?: string
+          local_business_json_ld?: Json
+          org_json_ld?: Json
+          singleton?: boolean
+          site_name?: string
+          title_template?: string
+          updated_at?: string
         }
         Relationships: []
       }
