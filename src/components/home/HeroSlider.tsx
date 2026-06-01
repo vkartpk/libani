@@ -2,11 +2,14 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
+import heroGaming from "@/assets/hero-gaming.jpg";
+import heroPower from "@/assets/hero-power.jpg";
+import heroAudio from "@/assets/hero-audio.jpg";
 
 const slides = [
-  { eyebrow: "Gaming Collection", title: "Level Up Your Setup", desc: "Mechanical keyboards, precision mice, and headsets built for victory.", cta: "/category/gaming-mouse", img: "https://picsum.photos/seed/hero-gaming/900/700", grad: "from-primary/30 to-background" },
-  { eyebrow: "Power & Charging", title: "Stay Connected, Stay Charged", desc: "20,000mAh power banks, 100W cables, fast chargers. We've got you covered.", cta: "/category/power-banks", img: "https://picsum.photos/seed/hero-power/900/700", grad: "from-success/20 to-background" },
-  { eyebrow: "Premium Audio", title: "Sound That Moves You", desc: "TWS earbuds, over-ear headphones, neckbands — from JBL-rivalling quality at honest prices.", cta: "/category/tws", img: "https://picsum.photos/seed/hero-audio/900/700", grad: "from-primary/40 to-background" },
+  { eyebrow: "Gaming Collection", title: "Level Up Your Setup", desc: "Mechanical keyboards, precision mice, and headsets built for victory.", cta: "/category/gaming-mouse", img: heroGaming, grad: "from-primary/30 to-background" },
+  { eyebrow: "Power & Charging", title: "Stay Connected, Stay Charged", desc: "20,000mAh power banks, 100W cables, fast chargers. We've got you covered.", cta: "/category/power-banks", img: heroPower, grad: "from-success/20 to-background" },
+  { eyebrow: "Premium Audio", title: "Sound That Moves You", desc: "TWS earbuds, over-ear headphones, neckbands — from JBL-rivalling quality at honest prices.", cta: "/category/tws", img: heroAudio, grad: "from-primary/40 to-background" },
 ];
 
 export function HeroSlider() {
