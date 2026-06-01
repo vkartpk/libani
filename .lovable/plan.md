@@ -1,47 +1,33 @@
-## AI-Powered SEO / AEO / GEO for Products
+## Problem
 
-Right now the admin has no place to manage SEO. Products do have `meta_title` / `meta_description` / `tags` columns in the database, but they're hidden from the UI. I'll expose them and add an **AI generator** (powered by Lovable AI — no API key needed) that writes optimized metadata for one product or *all* products at once.
+On `/admin/seo` the row actions only show a red **Regenerate** button. The **Edit** button technically exists in the code (`<Button variant="ghost">Edit</Button>`) but it's hidden because:
 
-### What you'll get
+1. The actions column has no fixed width, so the long "Regenerate" label pushes Edit off the visible area on smaller widths.
+2. `variant="ghost"` makes it nearly invisible against the dark background.
+3. There's no obvious way to open the editor — clicking the product name/row does nothing either.
 
-A new **SEO** section in the admin sidebar (`/admin/seo`) with:
+## Fix (UI-only, in `src/pages/admin/Seo.tsx`)
 
-1. **Product SEO table** — every product with its current title, meta title, meta description, status badge (Optimized / Missing / Stale), and last-updated date. Filters: missing only, by category, by brand, search.
-2. **One-click "Generate with AI"** per row — fills meta title, meta description, keywords/tags, an FAQ block (AEO), and a localized snippet for Pakistan (GEO: city/region keywords like Karachi, Lahore, Islamabad, PKR, Pakistan delivery).
-3. **Bulk "Optimize all missing"** — runs the same generator across every product that's missing SEO, with a live progress bar.
-4. **Edit dialog** — review/tweak the AI output, then save. Also editable from the existing product dialog (a new "SEO" tab).
-5. **Site-wide SEO settings** — default title template (`%product% | vKart Pakistan`), default description template, default OG image, organization JSON-LD (already partly in `SEO.tsx`, will be wired to settings).
-6. **AEO (Answer Engine Optimization)**: AI generates a short FAQ (3–5 Q&A) and a "key facts" summary stored on the product. Rendered on the product page as `FAQPage` JSON-LD so ChatGPT/Perplexity/Google AI Overviews can cite it.
-7. **GEO (Generative Engine Optimization / local SEO)**: prompts steer AI to include Pakistan-specific phrasing, city mentions, currency, and shipping language. A `LocalBusiness` JSON-LD is added site-wide.
+1. **Make Edit a first-class action**
+   - Change Edit to `variant="outline"` with a pencil icon (`Pencil` from lucide-react) so it's clearly visible next to Regenerate.
+   - Stack the two action buttons vertically on narrow widths (`flex-col md:flex-row`) and give the actions column a fixed min-width so neither button gets clipped.
 
-### Technical plan
+2. **Make the row itself open the editor**
+   - Add `onClick={() => setEditing(p)}` and `cursor-pointer hover:bg-muted/40` to each `<tr>`.
+   - Make the product name look like a link (underline on hover) to hint it's clickable.
+   - Stop propagation on the action buttons so clicking Regenerate/Edit doesn't double-trigger.
 
-**1. Database (migration)**
-- Add columns to `products`: `seo_keywords text[]`, `seo_faq jsonb` (`[{q,a}]`), `seo_updated_at timestamptz`.
-- New table `site_settings` (single-row, admin-only RW) for default SEO templates, org info, default OG image.
+3. **Add a top-right "Edit" entry point per row on mobile**
+   - On screens < md, show a kebab/`MoreHorizontal` button that opens the same edit dialog, so the table stays readable.
 
-**2. Edge function `seo-generate`** (uses `LOVABLE_API_KEY`, `google/gemini-3-flash-preview`)
-- Input: `{ product_ids: string[], mode: "missing" | "all" }`
-- For each product: pull name/brand/category/description, prompt Gemini with tool-calling to return structured JSON `{meta_title, meta_description, keywords, faq, geo_snippet}`.
-- Writes back to `products`. Auth-gated: caller must be admin (verify JWT + `has_role`).
-- Handles 429/402 → returns friendly error to the toast.
+4. **Polish the edit dialog (already exists, minor tweaks)**
+   - Surface a small "Last optimized" timestamp at the top using `seo_updated_at`.
+   - Show character-count colour hints (green when within 50–60 / 140–160, amber otherwise) on title/description.
 
-**3. Frontend**
-- New `src/pages/admin/Seo.tsx` (table + bulk action + filters).
-- New `src/pages/admin/SeoSettings.tsx` (site-wide defaults).
-- New `src/components/admin/SeoEditor.tsx` (per-product editor with "Regenerate" button; also embedded as a tab in the existing product dialog).
-- Add **SEO** + **SEO Settings** entries to `AdminLayout` sidebar.
-- Update `src/components/SEO.tsx` to optionally render `FAQPage` JSON-LD when `faq` is passed.
-- Update `src/pages/ProductDetail.tsx` to pull `seo_faq` and pass it to `<SEO>`, and use `meta_title`/`meta_description` from DB.
+No backend, schema, or edge-function changes — the editor, save logic, and `seo-generate` function already work.
 
-**4. Files**
-- new migration: `add_product_seo_and_settings.sql`
-- new: `supabase/functions/seo-generate/index.ts`
-- new: `src/pages/admin/Seo.tsx`, `src/pages/admin/SeoSettings.tsx`
-- new: `src/components/admin/SeoEditor.tsx`
-- edit: `src/pages/admin/AdminLayout.tsx` (sidebar), `src/pages/admin/Products.tsx` (SEO tab in dialog), `src/components/SEO.tsx`, `src/pages/ProductDetail.tsx`, `src/App.tsx` (routes)
+## Files touched
 
-### Cost note
-Each AI generation call uses Lovable AI credits. Bulk-optimizing hundreds of products at once will consume credits — the bulk button will show an estimated count before running.
+- `src/pages/admin/Seo.tsx` — row actions, click-to-edit, dialog polish.
 
-Approve and I'll implement.
+That's it.
