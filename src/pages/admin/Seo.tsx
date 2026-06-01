@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
-import { Sparkles, Loader2, RefreshCw } from "lucide-react";
+import { Sparkles, Loader2, RefreshCw, Pencil } from "lucide-react";
 import { toast } from "sonner";
 
 type Product = any;
@@ -113,8 +113,12 @@ export default function AdminSeo() {
               {!loading && filtered.map(p => {
                 const has = p.meta_title && p.meta_description;
                 return (
-                  <tr key={p.id} className="border-t align-top">
-                    <td className="py-2 max-w-[200px] truncate font-medium">{p.name}</td>
+                  <tr
+                    key={p.id}
+                    className="border-t align-top cursor-pointer hover:bg-muted/40 transition-colors"
+                    onClick={() => setEditing(p)}
+                  >
+                    <td className="py-2 max-w-[200px] truncate font-medium hover:underline">{p.name}</td>
                     <td className="max-w-[260px] text-xs truncate text-muted-foreground">{p.meta_title || <span className="italic">— none —</span>}</td>
                     <td className="max-w-[320px] text-xs truncate text-muted-foreground">{p.meta_description || <span className="italic">— none —</span>}</td>
                     <td>
@@ -122,13 +126,16 @@ export default function AdminSeo() {
                         ? <Badge variant="secondary" className="bg-green-500/10 text-green-700 dark:text-green-400">Optimized</Badge>
                         : <Badge variant="secondary" className="bg-orange-500/10 text-orange-600">Missing</Badge>}
                     </td>
-                    <td>
-                      <div className="flex gap-1">
+                    <td className="min-w-[200px]" onClick={(e) => e.stopPropagation()}>
+                      <div className="flex flex-col md:flex-row gap-1 justify-end">
+                        <Button size="sm" variant="default" onClick={() => setEditing(p)}>
+                          <Pencil className="h-3 w-3" />
+                          <span className="ml-1">Edit</span>
+                        </Button>
                         <Button size="sm" variant="outline" onClick={() => generateOne(p)} disabled={busy === p.id}>
                           {busy === p.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <Sparkles className="h-3 w-3" />}
                           <span className="ml-1">{has ? "Regenerate" : "Generate"}</span>
                         </Button>
-                        <Button size="sm" variant="ghost" onClick={() => setEditing(p)}>Edit</Button>
                       </div>
                     </td>
                   </tr>
