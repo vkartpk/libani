@@ -1,33 +1,26 @@
 ## Problem
 
-On `/admin/seo` the row actions only show a red **Regenerate** button. The **Edit** button technically exists in the code (`<Button variant="ghost">Edit</Button>`) but it's hidden because:
+Hero slider and the gaming banner use random `picsum.photos` placeholder images that have nothing to do with the products sold (gaming gear, chargers/power banks, audio). They look generic and unrealistic.
 
-1. The actions column has no fixed width, so the long "Regenerate" label pushes Edit off the visible area on smaller widths.
-2. `variant="ghost"` makes it nearly invisible against the dark background.
-3. There's no obvious way to open the editor — clicking the product name/row does nothing either.
+## Fix
 
-## Fix (UI-only, in `src/pages/admin/Seo.tsx`)
+Generate 4 product-relevant photo-real images with the agent's premium image tool and wire them into the existing components.
 
-1. **Make Edit a first-class action**
-   - Change Edit to `variant="outline"` with a pencil icon (`Pencil` from lucide-react) so it's clearly visible next to Regenerate.
-   - Stack the two action buttons vertically on narrow widths (`flex-col md:flex-row`) and give the actions column a fixed min-width so neither button gets clipped.
+### Images to generate (saved to `src/assets/`)
 
-2. **Make the row itself open the editor**
-   - Add `onClick={() => setEditing(p)}` and `cursor-pointer hover:bg-muted/40` to each `<tr>`.
-   - Make the product name look like a link (underline on hover) to hint it's clickable.
-   - Stop propagation on the action buttons so clicking Regenerate/Edit doesn't double-trigger.
+1. `hero-gaming.jpg` — Dark moody gaming desk setup: RGB mechanical keyboard, gaming mouse, headset on a black desk with red/magenta RGB glow. Matches "Level Up Your Setup" slide.
+2. `hero-power.jpg` — Clean product shot of a 20,000 mAh power bank, USB-C cables and a fast wall charger on a dark gradient surface. Matches "Stay Connected, Stay Charged" slide.
+3. `hero-audio.jpg` — Premium TWS earbuds in open charging case + over-ear headphones, dark studio lighting with subtle blue rim light. Matches "Sound That Moves You" slide.
+4. `gaming-banner.jpg` — Wide cinematic banner: gaming chair, monitor with neon game scene, mechanical keyboard + mouse, RGB ambient lighting. Used as background for the "Gaming Setup" CTA section.
 
-3. **Add a top-right "Edit" entry point per row on mobile**
-   - On screens < md, show a kebab/`MoreHorizontal` button that opens the same edit dialog, so the table stays readable.
+### Code changes
 
-4. **Polish the edit dialog (already exists, minor tweaks)**
-   - Surface a small "Last optimized" timestamp at the top using `seo_updated_at`.
-   - Show character-count colour hints (green when within 50–60 / 140–160, amber otherwise) on title/description.
+- `src/components/home/HeroSlider.tsx` — import the three new `hero-*.jpg` assets and replace the `picsum.photos` URLs in the `slides` array.
+- `src/components/home/GamingBanner.tsx` — import `gaming-banner.jpg` and replace the picsum URL on the background `<img>`.
 
-No backend, schema, or edge-function changes — the editor, save logic, and `seo-generate` function already work.
+No layout, animation, or copy changes. No other components touched (FeaturedSpotlight, BrandCollection, ProductCard etc. already use real product images).
 
 ## Files touched
 
-- `src/pages/admin/Seo.tsx` — row actions, click-to-edit, dialog polish.
-
-That's it.
+- new: `src/assets/hero-gaming.jpg`, `src/assets/hero-power.jpg`, `src/assets/hero-audio.jpg`, `src/assets/gaming-banner.jpg`
+- edited: `src/components/home/HeroSlider.tsx`, `src/components/home/GamingBanner.tsx`
