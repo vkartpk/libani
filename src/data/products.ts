@@ -161,3 +161,118 @@ export const getProductsByCategory = (cat: string) => products.filter((p) => p.c
 export const featuredProducts = products.filter((p) => p.isFeatured);
 export const onSaleProducts = products.filter((p) => p.isOnSale);
 export const newArrivals = products.filter((p) => p.isNewArrival);
+
+// ---- DB hydration ----
+// Storefront uses this static array as the initial value; on app load we
+// fetch the live products from the database and replace the contents of
+// this array in place so that anything imported as `products` reflects the
+// admin-managed catalogue (including uploaded images).
+
+import { supabase } from "@/integrations/supabase/client";
+
+type DbRow = {
+  id: string;
+  slug: string;
+  name: string;
+  brand_slug: string;
+  category_slug: string;
+  subcategory_slug: string | null;
+  tags: string[] | null;
+  images: string[] | null;
+  price: number | string;
+  compare_at_price: number | string | null;
+  in_stock: boolean;
+  stock_count: number;
+  rating: number | string;
+  review_count: number;
+  description: string | null;
+  features: unknown;
+  specs: unknown;
+  is_featured: boolean;
+  is_new_arrival: boolean;
+  is_on_sale: boolean;
+  sku: string | null;
+  weight: string | null;
+  free_shipping: boolean;
+  meta_title: string | null;
+  meta_description: string | null;
+  is_active: boolean;
+};
+
+const num = (v: unknown, fb = 0): number => {
+  const n = typeof v === "string" ? parseFloat(v) : (v as number);
+  return Number.isFinite(n) ? n : fb;
+};
+
+const arr = <T,>(v: unknown, fb: T[]): T[] => (Array.isArray(v) ? (v as T[]) : fb);
+
+const mapRow = (r: DbRow): Product => {
+  const fallback = products.find((p) => p.slug === r.slug);
+  const images = arr<string>(r.images, []).filter(Boolean);
+  return {
+    id: r.id,
+    slug: r.slug,
+    name: r.name,
+    brand: r.brand_slug,
+    category: r.category_slug,
+    subcategory: r.subcategory_slug ?? r.category_slug,
+    tags: arr<string>(r.tags, fallback?.tags ?? [r.brand_slug, r.category_slug]),
+    images: images.length ? images : (fallback?.images ?? [img(`${r.slug}-1`)]),
+    price: num(r.price),
+    compareAtPrice: r.compare_at_price == null ? null : num(r.compare_at_price),
+    inStock: !!r.in_stock,
+    stockCount: r.stock_count ?? 0,
+    rating: num(r.rating, 4.5),
+    reviewCount: r.review_count ?? 0,
+    variants: fallback?.variants ?? [],
+    description: r.description ?? fallback?.description ?? baseDescription(r.name),
+    features: arr<string>(r.features, fallback?.features ?? []),
+    specs: arr<{ key: string; value: string }>(r.specs, fallback?.specs ?? []),
+    isFeatured: !!r.is_featured,
+    isNewArrival: !!r.is_new_arrival,
+    isOnSale: !!r.is_on_sale,
+    sku: r.sku ?? fallback?.sku ?? `TZ-${r.slug.toUpperCase()}`,
+    weight: r.weight ?? fallback?.weight ?? "0.5 kg",
+    freeShipping: !!r.free_shipping,
+    metaTitle: r.meta_title ?? fallback?.metaTitle ?? `${r.name} | TechZone`,
+    metaDescription:
+      r.meta_description ??
+      fallback?.metaDescription ??
+      `Buy ${r.name} online in Pakistan at TechZone.`,
+  };
+};
+
+const refreshDerived = () => {
+  featuredProducts.length = 0;
+  featuredProducts.push(...products.filter((p) => p.isFeatured));
+  onSaleProducts.length = 0;
+  onSaleProducts.push(...products.filter((p) => p.isOnSale));
+  newArrivals.length = 0;
+  newArrivals.push(...products.filter((p) => p.isNewArrival));
+};
+
+let hydratePromise: Promise<void> | null = null;
+const listeners = new Set<() => void>();
+export const subscribeProducts = (fn: () => void) => {
+  listeners.add(fn);
+  return () => listeners.delete(fn);
+};
+
+export const hydrateProductsFromDb = async (): Promise<void> => {
+  if (hydratePromise) return hydratePromise;
+  hydratePromise = (async () => {
+    const { data, error } = await supabase
+      .from("products")
+      .select("*")
+      .eq("is_active", true)
+      .order("created_at", { ascending: false })
+      .limit(1000);
+    if (error || !data || !data.length) return;
+    const mapped = (data as unknown as DbRow[]).map(mapRow);
+    products.length = 0;
+    products.push(...mapped);
+    refreshDerived();
+    listeners.forEach((fn) => fn());
+  })();
+  return hydratePromise;
+};

@@ -13,6 +13,7 @@ import { ThemeProvider } from "@/contexts/ThemeContext";
 import { CompareProvider } from "@/contexts/CompareContext";
 import { Layout } from "@/components/layout/Layout";
 import { ShimmerGrid } from "@/components/ShimmerCard";
+import { ProductsHydrator } from "@/components/ProductsHydrator";
 
 import Index from "./pages/Index.tsx";
 const Products = lazy(() => import("./pages/Products"));
@@ -62,6 +63,7 @@ const App = () => (
               <WishlistProvider>
                 <RecentlyViewedProvider>
                 <CompareProvider>
+                  <ProductsHydrator>
                   <Layout>
                     <Suspense fallback={<div className="container-x py-8"><ShimmerGrid /></div>}>
                       <Routes>
@@ -101,6 +103,7 @@ const App = () => (
                       </Routes>
                     </Suspense>
                   </Layout>
+                  </ProductsHydrator>
                 </CompareProvider>
                 </RecentlyViewedProvider>
               </WishlistProvider>
