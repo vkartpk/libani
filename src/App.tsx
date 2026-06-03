@@ -48,6 +48,8 @@ const AdminBrands = lazy(() => import("./pages/admin/Brands"));
 const AdminCustomers = lazy(() => import("./pages/admin/Customers"));
 const AdminSeo = lazy(() => import("./pages/admin/Seo"));
 const AdminFinance = lazy(() => import("./pages/admin/Finance"));
+const AdminPayments = lazy(() => import("./pages/admin/Payments"));
+const AdminImageOptimizer = lazy(() => import("./pages/admin/ImageOptimizer"));
 
 const queryClient = new QueryClient();
 
@@ -101,6 +103,8 @@ const App = () => (
                         <Route path="/admin/customers" element={<AdminCustomers />} />
                         <Route path="/admin/seo" element={<AdminSeo />} />
                         <Route path="/admin/finance" element={<AdminFinance />} />
+                        <Route path="/admin/payments" element={<AdminPayments />} />
+                        <Route path="/admin/image-optimizer" element={<AdminImageOptimizer />} />
                         <Route path="*" element={<NotFound />} />
                       </Routes>
                     </Suspense>
