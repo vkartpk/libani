@@ -7,13 +7,37 @@ import { toast } from "sonner";
 
 const BUCKET = "product-images";
 
+const AUTO_KEY = "img-optimizer-auto-on-upload";
+
+async function maybeOptimize(file: File): Promise<File> {
+  if (typeof window === "undefined") return file;
+  if (localStorage.getItem(AUTO_KEY) === "false") return file;
+  if (!file.type.startsWith("image/") || file.type === "image/svg+xml" || file.type === "image/gif") return file;
+  try {
+    const bmp = await createImageBitmap(file);
+    const max = 1600;
+    const scale = Math.min(1, max / Math.max(bmp.width, bmp.height));
+    const w = Math.round(bmp.width * scale);
+    const h = Math.round(bmp.height * scale);
+    const canvas = document.createElement("canvas");
+    canvas.width = w; canvas.height = h;
+    canvas.getContext("2d")!.drawImage(bmp, 0, 0, w, h);
+    const blob: Blob = await new Promise((r) => canvas.toBlob((b) => r(b!), "image/webp", 0.82));
+    if (blob.size >= file.size * 0.95) return file;
+    return new File([blob], file.name.replace(/\.[a-z0-9]+$/i, "") + ".webp", { type: "image/webp" });
+  } catch {
+    return file;
+  }
+}
+
 async function uploadOne(file: File, folder: string): Promise<string> {
-  const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
+  const optimized = await maybeOptimize(file);
+  const ext = optimized.name.split(".").pop()?.toLowerCase() || "jpg";
   const path = `${folder}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
-  const { error } = await supabase.storage.from(BUCKET).upload(path, file, {
+  const { error } = await supabase.storage.from(BUCKET).upload(path, optimized, {
     cacheControl: "3600",
     upsert: false,
-    contentType: file.type || undefined,
+    contentType: optimized.type || undefined,
   });
   if (error) throw error;
   const { data } = supabase.storage.from(BUCKET).getPublicUrl(path);
