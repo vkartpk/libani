@@ -194,6 +194,45 @@ export type Database = {
         }
         Relationships: []
       }
+      image_optimization_log: {
+        Row: {
+          action: string
+          alt_text: string | null
+          created_at: string
+          id: string
+          image_url: string
+          new_size: number | null
+          notes: string | null
+          original_size: number | null
+          product_id: string | null
+          status: string
+        }
+        Insert: {
+          action: string
+          alt_text?: string | null
+          created_at?: string
+          id?: string
+          image_url: string
+          new_size?: number | null
+          notes?: string | null
+          original_size?: number | null
+          product_id?: string | null
+          status?: string
+        }
+        Update: {
+          action?: string
+          alt_text?: string | null
+          created_at?: string
+          id?: string
+          image_url?: string
+          new_size?: number | null
+          notes?: string | null
+          original_size?: number | null
+          product_id?: string | null
+          status?: string
+        }
+        Relationships: []
+      }
       order_items: {
         Row: {
           created_at: string
@@ -298,6 +337,45 @@ export type Database = {
         }
         Relationships: []
       }
+      payment_methods: {
+        Row: {
+          code: string
+          config: Json
+          created_at: string
+          description: string | null
+          id: string
+          instructions: string | null
+          is_enabled: boolean
+          name: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          code: string
+          config?: Json
+          created_at?: string
+          description?: string | null
+          id?: string
+          instructions?: string | null
+          is_enabled?: boolean
+          name: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          code?: string
+          config?: Json
+          created_at?: string
+          description?: string | null
+          id?: string
+          instructions?: string | null
+          is_enabled?: boolean
+          name?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       product_variants: {
         Row: {
           id: string
@@ -346,6 +424,7 @@ export type Database = {
           features: Json
           free_shipping: boolean
           id: string
+          image_alts: Json
           images: string[]
           in_stock: boolean
           is_active: boolean
@@ -379,6 +458,7 @@ export type Database = {
           features?: Json
           free_shipping?: boolean
           id?: string
+          image_alts?: Json
           images?: string[]
           in_stock?: boolean
           is_active?: boolean
@@ -412,6 +492,7 @@ export type Database = {
           features?: Json
           free_shipping?: boolean
           id?: string
+          image_alts?: Json
           images?: string[]
           in_stock?: boolean
           is_active?: boolean
