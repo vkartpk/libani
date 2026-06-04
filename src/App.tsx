@@ -50,6 +50,7 @@ const AdminSeo = lazy(() => import("./pages/admin/Seo"));
 const AdminFinance = lazy(() => import("./pages/admin/Finance"));
 const AdminPayments = lazy(() => import("./pages/admin/Payments"));
 const AdminImageOptimizer = lazy(() => import("./pages/admin/ImageOptimizer"));
+const AdminSettings = lazy(() => import("./pages/admin/Settings"));
 
 const queryClient = new QueryClient();
 
@@ -105,6 +106,7 @@ const App = () => (
                         <Route path="/admin/finance" element={<AdminFinance />} />
                         <Route path="/admin/payments" element={<AdminPayments />} />
                         <Route path="/admin/image-optimizer" element={<AdminImageOptimizer />} />
+                        <Route path="/admin/settings" element={<AdminSettings />} />
                         <Route path="*" element={<NotFound />} />
                       </Routes>
                     </Suspense>

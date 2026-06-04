@@ -2,6 +2,8 @@ import { createContext, useContext, useEffect, useMemo, useState, ReactNode } fr
 import { safeStorage } from "@/lib/storage";
 import { products } from "@/data/products";
 import type { Product } from "@/data/types";
+import { useSiteSettings } from "@/hooks/useSiteSettings";
+import { supabase } from "@/integrations/supabase/client";
 
 export type CartItem = {
   productId: string;
@@ -35,6 +37,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<CartItem[]>(() => safeStorage.get(KEY, []));
   const [coupon, setCoupon] = useState<string | null>(() => safeStorage.get(COUPON_KEY, null));
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [appliedDiscount, setAppliedDiscount] = useState(0);
+  const [freeShipFromCoupon, setFreeShipFromCoupon] = useState(false);
+  const { settings } = useSiteSettings();
 
   useEffect(() => safeStorage.set(KEY, items), [items]);
   useEffect(() => safeStorage.set(COUPON_KEY, coupon), [coupon]);
@@ -76,15 +81,42 @@ export function CartProvider({ children }: { children: ReactNode }) {
   );
 
   const subtotal = enriched.reduce((acc, { item, product }) => acc + product.price * item.qty, 0);
-  const shipping = subtotal === 0 ? 0 : subtotal >= 1000 ? 0 : 200;
-  const discount = coupon === "SAVE10" ? Math.round(subtotal * 0.1) : 0;
+  const baseShipping = subtotal === 0
+    ? 0
+    : (settings.free_shipping_threshold > 0 && subtotal >= settings.free_shipping_threshold)
+      ? 0
+      : Number(settings.shipping_fee || 0);
+  const shipping = freeShipFromCoupon ? 0 : baseShipping;
+  const discount = Math.min(appliedDiscount, subtotal);
   const total = Math.max(0, subtotal + shipping - discount);
   const count = items.reduce((a, i) => a + i.qty, 0);
 
+  // Re-evaluate coupon whenever subtotal or coupon changes
+  useEffect(() => {
+    let cancelled = false;
+    const run = async () => {
+      if (!coupon) { setAppliedDiscount(0); setFreeShipFromCoupon(false); return; }
+      const { data } = await supabase.from("coupons").select("*").eq("code", coupon).eq("active", true).maybeSingle();
+      if (cancelled) return;
+      if (!data) { setAppliedDiscount(0); setFreeShipFromCoupon(false); return; }
+      const now = new Date();
+      if (data.starts_at && new Date(data.starts_at) > now) { setAppliedDiscount(0); setFreeShipFromCoupon(false); return; }
+      if (data.ends_at && new Date(data.ends_at) < now) { setAppliedDiscount(0); setFreeShipFromCoupon(false); return; }
+      if (Number(data.min_subtotal || 0) > subtotal) { setAppliedDiscount(0); setFreeShipFromCoupon(false); return; }
+      if (data.type === "free_shipping") { setFreeShipFromCoupon(true); setAppliedDiscount(0); return; }
+      let d = data.type === "percent" ? Math.round(subtotal * (Number(data.value) / 100)) : Number(data.value);
+      if (data.max_discount) d = Math.min(d, Number(data.max_discount));
+      setAppliedDiscount(d);
+      setFreeShipFromCoupon(false);
+    };
+    run();
+    return () => { cancelled = true; };
+  }, [coupon, subtotal]);
+
   const applyCoupon = (code: string) => {
-    const ok = code.trim().toUpperCase() === "SAVE10";
-    setCoupon(ok ? "SAVE10" : null);
-    return ok;
+    const c = code.trim().toUpperCase();
+    setCoupon(c || null);
+    return !!c;
   };
 
   return (
