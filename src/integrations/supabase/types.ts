@@ -161,6 +161,54 @@ export type Database = {
         }
         Relationships: []
       }
+      coupons: {
+        Row: {
+          active: boolean
+          code: string
+          created_at: string
+          ends_at: string | null
+          id: string
+          max_discount: number | null
+          min_subtotal: number
+          starts_at: string | null
+          type: string
+          updated_at: string
+          usage_limit: number | null
+          used_count: number
+          value: number
+        }
+        Insert: {
+          active?: boolean
+          code: string
+          created_at?: string
+          ends_at?: string | null
+          id?: string
+          max_discount?: number | null
+          min_subtotal?: number
+          starts_at?: string | null
+          type: string
+          updated_at?: string
+          usage_limit?: number | null
+          used_count?: number
+          value?: number
+        }
+        Update: {
+          active?: boolean
+          code?: string
+          created_at?: string
+          ends_at?: string | null
+          id?: string
+          max_discount?: number | null
+          min_subtotal?: number
+          starts_at?: string | null
+          type?: string
+          updated_at?: string
+          usage_limit?: number | null
+          used_count?: number
+          value?: number
+        }
+        Relationships: []
+      }
       expenses: {
         Row: {
           amount: number
@@ -551,40 +599,100 @@ export type Database = {
       }
       site_settings: {
         Row: {
+          address: string | null
+          announcement_enabled: boolean
+          announcement_link: string | null
+          announcement_text: string | null
+          cod_fee: number
           created_at: string
+          currency_code: string
+          currency_decimals: number
+          currency_locale: string
+          currency_symbol: string
           default_og_image: string | null
+          delivery_days_max: number
+          delivery_days_min: number
           description_template: string
+          free_shipping_threshold: number
           id: string
           local_business_json_ld: Json
+          logo_url: string | null
           org_json_ld: Json
+          promo: Json
+          shipping_fee: number
           singleton: boolean
           site_name: string
+          social: Json
+          support_email: string | null
+          support_phone: string | null
+          tagline: string | null
           title_template: string
           updated_at: string
+          whatsapp: string | null
         }
         Insert: {
+          address?: string | null
+          announcement_enabled?: boolean
+          announcement_link?: string | null
+          announcement_text?: string | null
+          cod_fee?: number
           created_at?: string
+          currency_code?: string
+          currency_decimals?: number
+          currency_locale?: string
+          currency_symbol?: string
           default_og_image?: string | null
+          delivery_days_max?: number
+          delivery_days_min?: number
           description_template?: string
+          free_shipping_threshold?: number
           id?: string
           local_business_json_ld?: Json
+          logo_url?: string | null
           org_json_ld?: Json
+          promo?: Json
+          shipping_fee?: number
           singleton?: boolean
           site_name?: string
+          social?: Json
+          support_email?: string | null
+          support_phone?: string | null
+          tagline?: string | null
           title_template?: string
           updated_at?: string
+          whatsapp?: string | null
         }
         Update: {
+          address?: string | null
+          announcement_enabled?: boolean
+          announcement_link?: string | null
+          announcement_text?: string | null
+          cod_fee?: number
           created_at?: string
+          currency_code?: string
+          currency_decimals?: number
+          currency_locale?: string
+          currency_symbol?: string
           default_og_image?: string | null
+          delivery_days_max?: number
+          delivery_days_min?: number
           description_template?: string
+          free_shipping_threshold?: number
           id?: string
           local_business_json_ld?: Json
+          logo_url?: string | null
           org_json_ld?: Json
+          promo?: Json
+          shipping_fee?: number
           singleton?: boolean
           site_name?: string
+          social?: Json
+          support_email?: string | null
+          support_phone?: string | null
+          tagline?: string | null
           title_template?: string
           updated_at?: string
+          whatsapp?: string | null
         }
         Relationships: []
       }
