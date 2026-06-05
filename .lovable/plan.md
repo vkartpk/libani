@@ -1,73 +1,42 @@
-## Admin Settings Module
+## Goal
 
-New page **`/admin/settings`** with a tabbed UI for site-wide configuration. Values live in the database and are read by the storefront so any change is reflected on the frontend without code edits.
+Replace every product image and the 3 homepage hero banners with fresh AI-generated visuals that actually match each product (name + brand + category).
 
-### Tabs
+## Scope
 
-**1. Users & Roles**
-- Reuses `admin_list_customers` RPC (already used in Customers page).
-- Grant / revoke `admin` role via `user_roles` table.
-- Adds a third role `manager` (read-only admin) to `app_role` enum + toggle.
-- Search by name / phone / email; shows current roles as chips.
+- **47 products** in the catalog — generate **1 polished studio shot per product** and set it as the product's image (replacing the existing 4-image array with a single, accurate image). Keeps the catalog visually consistent and avoids 188 generations.
+- **3 hero slides** on the homepage (Gaming, Power & Charging, Premium Audio) — regenerate as wider 16:9 lifestyle banners.
+- **Homepage banner components** that currently use category stock art (e.g. `GamingBanner`, category showcase tiles) — leave untouched unless they break; the user said "products + homepage visuals," and hero + product cards cover the visible homepage. Out of scope: brand logos, category tiles, blog images.
 
-**2. Business**
-- Site name, tagline, support phone, support email, WhatsApp number, address.
-- Social links (Facebook, Instagram, TikTok, YouTube).
-- Logo upload (uses existing `product-images` bucket, folder `branding/`).
-- Frontend `Header`, `Footer`, and `Contact` page read these via a `useSiteSettings()` hook.
+## Approach
 
-**3. Delivery & Currency**
-- Currency: code (PKR/USD/AED…), symbol, locale, decimals.
-- `formatPKR` in `src/lib/storage.ts` becomes `formatMoney` that reads the active currency from settings (cached in React Query, fallback PKR).
-- Delivery: flat shipping fee, free-shipping threshold, COD fee, estimated delivery days.
-- `CartContext` shipping calc switches from hard-coded `>= 1000 ? 0 : 200` to settings-driven values.
+### Product images (47)
+Run a Node script (`scripts/regen-product-images.ts`) that:
+1. Fetches all products from `public.products`.
+2. For each product, builds a tight prompt: `"Professional studio product photograph of a {name}, {category} category, {brand} branding, centered on clean light-gray gradient background, soft shadows, e-commerce hero shot, 1:1, ultra-detailed, no text overlays"`.
+3. Calls the Lovable AI Gateway image endpoint (`openai/gpt-image-2`, `quality: "low"`, non-streaming, 1024×1024).
+4. Uploads the resulting PNG to the existing `product-images` bucket at `regen/{slug}.png` (public bucket → public URL).
+5. Updates the row: `images = [public_url]`, `image_alts = [name]`.
+6. Logs progress + writes a summary so failures can be retried.
 
-**4. Offers & Conditions**
-- Announcement bar text + enabled toggle + link.
-- Active promo banner (title, subtitle, CTA, image, enabled, start/end date).
-- Coupon rules: list of coupons `{ code, type: percent|fixed, value, min_subtotal, max_discount, starts_at, ends_at, active }` — replaces any hard-coded coupons.
-- Storefront `applyCoupon` validates against this table.
+Runs sequentially with a small delay to stay under rate limits. Re-runnable: if a slug already has `regen/{slug}.png`, it's overwritten.
 
-### Database changes (single migration)
+### Hero slides (3)
+Generate 3 16:9 (1536×864) banners directly into `src/assets/`, overwriting `hero-gaming.jpg`, `hero-power.jpg`, `hero-audio.jpg`. Prompts tuned to lifestyle product photography matching each slide's eyebrow/title. `HeroSlider.tsx` already imports these — no code change needed.
 
-Extend `public.site_settings` (singleton row) with columns:
-```text
-tagline, support_phone, support_email, whatsapp, address,
-social jsonb, logo_url,
-currency_code, currency_symbol, currency_locale, currency_decimals,
-shipping_fee, free_shipping_threshold, cod_fee, delivery_days_min, delivery_days_max,
-announcement_text, announcement_link, announcement_enabled,
-promo jsonb
-```
+## Technical Notes
 
-New table `public.coupons`:
-```text
-id, code (unique, citext), type (percent|fixed), value numeric,
-min_subtotal numeric, max_discount numeric,
-starts_at, ends_at, active bool, usage_limit, used_count,
-created_at, updated_at
-```
-- GRANTs: `SELECT` to `anon` + `authenticated` (needed at checkout), full to `service_role`; admin writes via `is_admin()` policy.
-- `app_role` enum: add `'manager'`.
-- Public read policy on `site_settings` already exists; admin write via `is_admin()`.
+- Script auth: uses `SUPABASE_SERVICE_ROLE_KEY` + `LOVABLE_API_KEY` from sandbox env, run via `bun scripts/regen-product-images.ts`. No edge function needed — this is a one-time admin job.
+- The `products` table already exposes `images text[]` + `image_alts text[]`; no schema change.
+- `ProductsHydrator` + the live `products` subscription means the storefront picks up the new URLs without redeploy.
+- Estimated cost: 47 product images + 3 hero images at low quality ≈ 50 image generations.
 
-### Frontend wiring
+## Out of Scope
 
-- New `src/hooks/useSiteSettings.ts` — React Query, 5-min stale, fallback defaults.
-- `src/lib/money.ts` — `formatMoney(n, settings)`; keep `formatPKR` as a thin re-export to avoid touching every call site.
-- `CartContext` consumes settings for shipping + COD.
-- `AnnouncementBar`, `Header`, `Footer`, `Contact`, `Checkout` read from the hook.
-- New `src/pages/admin/Settings.tsx` with shadcn `Tabs` (Users / Business / Delivery & Currency / Offers).
-- Sidebar item added to `AdminLayout` (`Settings` icon, route `/admin/settings`).
-- Lazy route added in `src/App.tsx`.
+- Per-variant color swatches (variants array stays).
+- Category showcase / brand collection / flash-sale background art.
+- Multi-angle galleries (will revisit if you want 3-4 images per product after seeing results).
 
-### Out of scope (this pass)
-- Multi-currency conversion (only display currency changes; prices stay stored as one numeric).
-- Per-city / weight-based shipping rules.
-- Coupon usage tracking UI beyond `used_count` increment.
-- Email templates / SMTP settings.
+## Confirm before running
 
-### Open questions before I build
-1. Add the `manager` role now, or keep just `admin` + `customer`?
-2. For coupons — keep it simple (percent + fixed only), or do you also want "free shipping" coupon type?
-3. Should the Offers tab also control the homepage Hero slider / Flash sale block, or only the announcement bar + promo banner + coupons?
+Reply "go" and I'll create the script, generate all 50 images, and update the database + hero assets.
