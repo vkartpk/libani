@@ -1,42 +1,31 @@
-## Goal
+## Add Theme & Site Status controls to Admin Settings
 
-Replace every product image and the 3 homepage hero banners with fresh AI-generated visuals that actually match each product (name + brand + category).
+Add a new **Appearance** tab to `/admin/settings` with two features:
 
-## Scope
+### 1. Theme color customization
+- Color pickers for the core brand tokens: **Primary**, **Accent**, **Background**, **Foreground** (with live preview swatches).
+- Default-mode toggle: Dark / Light / Follow system.
+- "Reset to defaults" button.
+- Saved into `site_settings` and applied globally on every page load by injecting CSS variables (HSL) into `:root` from a small `ThemeApplier` component mounted in `App.tsx`. Existing `ThemeContext` (dark/light) keeps working — admin choice just sets the initial default.
 
-- **47 products** in the catalog — generate **1 polished studio shot per product** and set it as the product's image (replacing the existing 4-image array with a single, accurate image). Keeps the catalog visually consistent and avoids 188 generations.
-- **3 hero slides** on the homepage (Gaming, Power & Charging, Premium Audio) — regenerate as wider 16:9 lifestyle banners.
-- **Homepage banner components** that currently use category stock art (e.g. `GamingBanner`, category showcase tiles) — leave untouched unless they break; the user said "products + homepage visuals," and hero + product cards cover the visible homepage. Out of scope: brand logos, category tiles, blog images.
+### 2. Site ON / OFF (Maintenance mode)
+- Big toggle switch: **Site is LIVE** ⇄ **Site is OFF (Maintenance)**.
+- Optional custom maintenance message + ETA text.
+- When OFF: every public route shows a full-screen Maintenance page (logo + message). Admin routes (`/admin/*`) and `/auth` stay accessible so the owner can turn it back on.
+- Implemented via a `MaintenanceGate` wrapper in `Layout.tsx` that reads `site_settings.maintenance_mode`.
 
-## Approach
+### Technical details
+- **DB migration**: add columns to `site_settings`:
+  - `theme_primary text`, `theme_accent text`, `theme_background text`, `theme_foreground text` (HSL triplet strings like `"222 47% 11%"`)
+  - `theme_default_mode text` (`'dark' | 'light' | 'system'`)
+  - `maintenance_mode boolean default false`
+  - `maintenance_message text`, `maintenance_eta text`
+- **New components**:
+  - `src/components/ThemeApplier.tsx` — reads settings, writes CSS vars to `document.documentElement`.
+  - `src/pages/Maintenance.tsx` — branded offline screen.
+  - `src/components/MaintenanceGate.tsx` — wraps `Layout` children; bypasses for admins and `/admin`, `/auth`.
+- **Edit**: `src/pages/admin/Settings.tsx` (add `Appearance` tab with color inputs + maintenance toggle), `src/App.tsx` (mount `ThemeApplier` + `MaintenanceGate`).
+- No changes to existing dark/light toggle behavior in the header.
 
-### Product images (47)
-Run a Node script (`scripts/regen-product-images.ts`) that:
-1. Fetches all products from `public.products`.
-2. For each product, builds a tight prompt: `"Professional studio product photograph of a {name}, {category} category, {brand} branding, centered on clean light-gray gradient background, soft shadows, e-commerce hero shot, 1:1, ultra-detailed, no text overlays"`.
-3. Calls the Lovable AI Gateway image endpoint (`openai/gpt-image-2`, `quality: "low"`, non-streaming, 1024×1024).
-4. Uploads the resulting PNG to the existing `product-images` bucket at `regen/{slug}.png` (public bucket → public URL).
-5. Updates the row: `images = [public_url]`, `image_alts = [name]`.
-6. Logs progress + writes a summary so failures can be retried.
-
-Runs sequentially with a small delay to stay under rate limits. Re-runnable: if a slug already has `regen/{slug}.png`, it's overwritten.
-
-### Hero slides (3)
-Generate 3 16:9 (1536×864) banners directly into `src/assets/`, overwriting `hero-gaming.jpg`, `hero-power.jpg`, `hero-audio.jpg`. Prompts tuned to lifestyle product photography matching each slide's eyebrow/title. `HeroSlider.tsx` already imports these — no code change needed.
-
-## Technical Notes
-
-- Script auth: uses `SUPABASE_SERVICE_ROLE_KEY` + `LOVABLE_API_KEY` from sandbox env, run via `bun scripts/regen-product-images.ts`. No edge function needed — this is a one-time admin job.
-- The `products` table already exposes `images text[]` + `image_alts text[]`; no schema change.
-- `ProductsHydrator` + the live `products` subscription means the storefront picks up the new URLs without redeploy.
-- Estimated cost: 47 product images + 3 hero images at low quality ≈ 50 image generations.
-
-## Out of Scope
-
-- Per-variant color swatches (variants array stays).
-- Category showcase / brand collection / flash-sale background art.
-- Multi-angle galleries (will revisit if you want 3-4 images per product after seeing results).
-
-## Confirm before running
-
-Reply "go" and I'll create the script, generate all 50 images, and update the database + hero assets.
+### Out of scope
+- Per-page theming, font customization, custom CSS editor, scheduled maintenance windows.
