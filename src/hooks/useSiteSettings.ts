@@ -26,6 +26,14 @@ export type SiteSettings = {
   announcement_link: string | null;
   announcement_enabled: boolean;
   promo: { title?: string; subtitle?: string; cta?: string; href?: string; image?: string; enabled?: boolean; starts_at?: string; ends_at?: string };
+  theme_primary: string | null;
+  theme_accent: string | null;
+  theme_background: string | null;
+  theme_foreground: string | null;
+  theme_default_mode: "dark" | "light" | "system" | null;
+  maintenance_mode: boolean;
+  maintenance_message: string | null;
+  maintenance_eta: string | null;
 };
 
 const DEFAULTS: SiteSettings = {
@@ -50,6 +58,14 @@ const DEFAULTS: SiteSettings = {
   announcement_link: null,
   announcement_enabled: false,
   promo: {},
+  theme_primary: null,
+  theme_accent: null,
+  theme_background: null,
+  theme_foreground: null,
+  theme_default_mode: "dark",
+  maintenance_mode: false,
+  maintenance_message: null,
+  maintenance_eta: null,
 };
 
 export function useSiteSettings() {
