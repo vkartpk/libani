@@ -48,24 +48,38 @@ Tags: ${(product.tags || []).join(", ")}
 
 Write SEO/AEO/GEO metadata. The FAQ should answer the top buyer questions (shipping, warranty, compatibility, COD, returns) tailored to Pakistan.`;
 
-  const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-    method: "POST",
-    headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
-    body: JSON.stringify({
-      model: "google/gemini-3-flash-preview",
-      messages: [
-        { role: "system", content: SYSTEM },
-        { role: "user", content: prompt },
-      ],
-      tools: [TOOL],
-      tool_choice: { type: "function", function: { name: "write_seo" } },
-    }),
+  const body = JSON.stringify({
+    model: "google/gemini-3-flash-preview",
+    messages: [
+      { role: "system", content: SYSTEM },
+      { role: "user", content: prompt },
+    ],
+    tools: [TOOL],
+    tool_choice: { type: "function", function: { name: "write_seo" } },
   });
 
-  if (!res.ok) {
-    const txt = await res.text();
-    const err: any = new Error(`AI gateway ${res.status}: ${txt}`);
+  // Retry on transient 429 with exponential backoff
+  let res: Response | null = null;
+  let lastTxt = "";
+  for (let attempt = 0; attempt < 4; attempt++) {
+    res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
+      body,
+    });
+    if (res.ok) break;
+    lastTxt = await res.text();
+    if (res.status === 429 && attempt < 3) {
+      await new Promise((r) => setTimeout(r, 1500 * Math.pow(2, attempt)));
+      continue;
+    }
+    const err: any = new Error(`AI gateway ${res.status}: ${lastTxt}`);
     err.status = res.status;
+    throw err;
+  }
+  if (!res || !res.ok) {
+    const err: any = new Error(`AI gateway ${res?.status}: ${lastTxt}`);
+    err.status = res?.status ?? 500;
     throw err;
   }
   const data = await res.json();
@@ -115,14 +129,13 @@ Deno.serve(async (req) => {
         if (uErr) throw uErr;
         results.push({ id: p.id, ok: true });
       } catch (e: any) {
-        if (e.status === 429) {
-          return new Response(JSON.stringify({ error: "Rate limit exceeded. Please try again in a minute." }), { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } });
-        }
         if (e.status === 402) {
           return new Response(JSON.stringify({ error: "AI credits exhausted. Add funds in Settings → Workspace → Usage." }), { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } });
         }
-        results.push({ id: p.id, ok: false, error: e.message });
+        results.push({ id: p.id, ok: false, error: e.message, status: e.status });
       }
+      // Small spacing between calls to avoid free-tier bursts
+      await new Promise((r) => setTimeout(r, 400));
     }
 
     return new Response(JSON.stringify({ results }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
