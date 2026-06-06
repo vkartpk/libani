@@ -14,6 +14,7 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogT
 import { toast } from "sonner";
 import { Plus, Trash2, ShieldCheck, ShieldOff, Pencil } from "lucide-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { hexToHslTriplet, hslTripletToHex } from "@/lib/colorUtils";
 
 export default function AdminSettings() {
   return (
@@ -24,11 +25,15 @@ export default function AdminSettings() {
           <TabsTrigger value="business">Business</TabsTrigger>
           <TabsTrigger value="delivery">Delivery & Currency</TabsTrigger>
           <TabsTrigger value="offers">Offers</TabsTrigger>
+          <TabsTrigger value="appearance">Appearance</TabsTrigger>
+          <TabsTrigger value="status">Site Status</TabsTrigger>
         </TabsList>
         <TabsContent value="users"><UsersTab /></TabsContent>
         <TabsContent value="business"><BusinessTab /></TabsContent>
         <TabsContent value="delivery"><DeliveryTab /></TabsContent>
         <TabsContent value="offers"><OffersTab /></TabsContent>
+        <TabsContent value="appearance"><AppearanceTab /></TabsContent>
+        <TabsContent value="status"><StatusTab /></TabsContent>
       </Tabs>
     </AdminLayout>
   );
@@ -352,5 +357,135 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
       <Label className="text-xs capitalize text-muted-foreground">{label}</Label>
       {children}
     </div>
+  );
+}
+
+/* ---------- Appearance ---------- */
+const THEME_FIELDS = [
+  { key: "theme_primary", label: "Primary / brand", fallback: "355 78% 56%" },
+  { key: "theme_accent", label: "Accent", fallback: "355 78% 56%" },
+  { key: "theme_background", label: "Background", fallback: "0 0% 5%" },
+  { key: "theme_foreground", label: "Foreground (text)", fallback: "0 0% 100%" },
+] as const;
+
+function AppearanceTab() {
+  const { form, set, save } = useSettingsForm();
+  const reset = () => {
+    THEME_FIELDS.forEach((f) => set(f.key, null));
+    set("theme_default_mode", "dark");
+  };
+  return (
+    <Card className="p-6 mt-4 space-y-6">
+      <div>
+        <h3 className="font-semibold mb-1">Theme colors</h3>
+        <p className="text-xs text-muted-foreground mb-4">
+          Pick custom colors for your storefront. Leave blank to use the built-in defaults.
+        </p>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {THEME_FIELDS.map((f) => {
+            const triplet = (form[f.key] as string | null) || f.fallback;
+            const hex = hslTripletToHex(triplet);
+            return (
+              <Field key={f.key} label={f.label}>
+                <div className="flex items-center gap-3">
+                  <input
+                    type="color"
+                    value={hex}
+                    onChange={(e) => {
+                      const t = hexToHslTriplet(e.target.value);
+                      if (t) set(f.key, t);
+                    }}
+                    className="h-10 w-14 rounded cursor-pointer border border-border bg-transparent"
+                  />
+                  <Input
+                    value={(form[f.key] as string | null) ?? ""}
+                    onChange={(e) => set(f.key, e.target.value || null)}
+                    placeholder={f.fallback}
+                    className="font-mono text-xs"
+                  />
+                </div>
+              </Field>
+            );
+          })}
+        </div>
+      </div>
+      <div>
+        <h3 className="font-semibold mb-3">Default mode</h3>
+        <Select
+          value={form.theme_default_mode || "dark"}
+          onValueChange={(v) => set("theme_default_mode", v)}
+        >
+          <SelectTrigger className="max-w-xs"><SelectValue /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="dark">Dark</SelectItem>
+            <SelectItem value="light">Light</SelectItem>
+            <SelectItem value="system">Follow system</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+      <div className="flex gap-2">
+        <Button
+          onClick={() =>
+            save([
+              "theme_primary",
+              "theme_accent",
+              "theme_background",
+              "theme_foreground",
+              "theme_default_mode",
+            ])
+          }
+        >
+          Save appearance
+        </Button>
+        <Button variant="outline" onClick={reset}>Reset to defaults</Button>
+      </div>
+    </Card>
+  );
+}
+
+/* ---------- Site Status ---------- */
+function StatusTab() {
+  const { form, set, save } = useSettingsForm();
+  const off = !!form.maintenance_mode;
+  return (
+    <Card className="p-6 mt-4 space-y-6">
+      <div className="flex items-start justify-between gap-4 rounded-lg border border-border p-4">
+        <div>
+          <h3 className="font-semibold flex items-center gap-2">
+            <span
+              className={`inline-block h-2.5 w-2.5 rounded-full ${off ? "bg-destructive" : "bg-success"}`}
+            />
+            {off ? "Site is OFF (Maintenance)" : "Site is LIVE"}
+          </h3>
+          <p className="text-xs text-muted-foreground mt-1 max-w-md">
+            When turned off, customers see a maintenance screen. You and other admins can still
+            access the storefront and admin panel.
+          </p>
+        </div>
+        <Switch
+          checked={!off}
+          onCheckedChange={(v) => set("maintenance_mode", !v)}
+        />
+      </div>
+      <Field label="Maintenance message">
+        <Textarea
+          value={form.maintenance_message || ""}
+          onChange={(e) => set("maintenance_message", e.target.value)}
+          placeholder="We're doing some quick maintenance. Please check back shortly."
+        />
+      </Field>
+      <Field label="Expected back online (optional)">
+        <Input
+          value={form.maintenance_eta || ""}
+          onChange={(e) => set("maintenance_eta", e.target.value)}
+          placeholder="e.g. in 30 minutes, or Today 6 PM"
+        />
+      </Field>
+      <Button
+        onClick={() => save(["maintenance_mode", "maintenance_message", "maintenance_eta"])}
+      >
+        Save site status
+      </Button>
+    </Card>
   );
 }

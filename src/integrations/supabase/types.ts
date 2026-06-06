@@ -617,6 +617,9 @@ export type Database = {
           id: string
           local_business_json_ld: Json
           logo_url: string | null
+          maintenance_eta: string | null
+          maintenance_message: string | null
+          maintenance_mode: boolean
           org_json_ld: Json
           promo: Json
           shipping_fee: number
@@ -626,6 +629,11 @@ export type Database = {
           support_email: string | null
           support_phone: string | null
           tagline: string | null
+          theme_accent: string | null
+          theme_background: string | null
+          theme_default_mode: string | null
+          theme_foreground: string | null
+          theme_primary: string | null
           title_template: string
           updated_at: string
           whatsapp: string | null
@@ -649,6 +657,9 @@ export type Database = {
           id?: string
           local_business_json_ld?: Json
           logo_url?: string | null
+          maintenance_eta?: string | null
+          maintenance_message?: string | null
+          maintenance_mode?: boolean
           org_json_ld?: Json
           promo?: Json
           shipping_fee?: number
@@ -658,6 +669,11 @@ export type Database = {
           support_email?: string | null
           support_phone?: string | null
           tagline?: string | null
+          theme_accent?: string | null
+          theme_background?: string | null
+          theme_default_mode?: string | null
+          theme_foreground?: string | null
+          theme_primary?: string | null
           title_template?: string
           updated_at?: string
           whatsapp?: string | null
@@ -681,6 +697,9 @@ export type Database = {
           id?: string
           local_business_json_ld?: Json
           logo_url?: string | null
+          maintenance_eta?: string | null
+          maintenance_message?: string | null
+          maintenance_mode?: boolean
           org_json_ld?: Json
           promo?: Json
           shipping_fee?: number
@@ -690,6 +709,11 @@ export type Database = {
           support_email?: string | null
           support_phone?: string | null
           tagline?: string | null
+          theme_accent?: string | null
+          theme_background?: string | null
+          theme_default_mode?: string | null
+          theme_foreground?: string | null
+          theme_primary?: string | null
           title_template?: string
           updated_at?: string
           whatsapp?: string | null

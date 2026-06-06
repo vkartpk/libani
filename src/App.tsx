@@ -14,6 +14,8 @@ import { CompareProvider } from "@/contexts/CompareContext";
 import { Layout } from "@/components/layout/Layout";
 import { ShimmerGrid } from "@/components/ShimmerCard";
 import { ProductsHydrator } from "@/components/ProductsHydrator";
+import { ThemeApplier } from "@/components/ThemeApplier";
+import { MaintenanceGate } from "@/components/MaintenanceGate";
 
 import Index from "./pages/Index.tsx";
 const Products = lazy(() => import("./pages/Products"));
@@ -68,6 +70,8 @@ const App = () => (
                 <RecentlyViewedProvider>
                 <CompareProvider>
                   <ProductsHydrator>
+                  <ThemeApplier />
+                  <MaintenanceGate>
                   <Layout>
                     <Suspense fallback={<div className="container-x py-8"><ShimmerGrid /></div>}>
                       <Routes>
@@ -111,6 +115,7 @@ const App = () => (
                       </Routes>
                     </Suspense>
                   </Layout>
+                  </MaintenanceGate>
                   </ProductsHydrator>
                 </CompareProvider>
                 </RecentlyViewedProvider>
