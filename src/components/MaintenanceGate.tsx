@@ -4,7 +4,7 @@ import { useSiteSettings } from "@/hooks/useSiteSettings";
 import { useUserRole } from "@/hooks/useUserRole";
 import Maintenance from "@/pages/Maintenance";
 
-const ALLOW_PREFIXES = ["/admin", "/auth", "/reset-password"];
+const ALLOW_PREFIXES = ["/libani", "/auth", "/reset-password"];
 
 export function MaintenanceGate({ children }: { children: ReactNode }) {
   const { settings, isLoading } = useSiteSettings();

@@ -7,17 +7,17 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 
 const items = [
-  { to: "/admin", label: "Dashboard", icon: LayoutDashboard, end: true },
-  { to: "/admin/orders", label: "Orders", icon: ShoppingBag },
-  { to: "/admin/products", label: "Products", icon: Package },
-  { to: "/admin/categories", label: "Categories", icon: Tags },
-  { to: "/admin/brands", label: "Brands", icon: Building2 },
-  { to: "/admin/customers", label: "Customers", icon: Users },
-  { to: "/admin/finance", label: "Finance", icon: Wallet },
-  { to: "/admin/payments", label: "Payments", icon: CreditCard },
-  { to: "/admin/image-optimizer", label: "Image Optimizer", icon: ImageIcon },
-  { to: "/admin/seo", label: "SEO / AEO / GEO", icon: Sparkles },
-  { to: "/admin/settings", label: "Settings", icon: SettingsIcon },
+  { to: "/libani", label: "Dashboard", icon: LayoutDashboard, end: true },
+  { to: "/libani/orders", label: "Orders", icon: ShoppingBag },
+  { to: "/libani/products", label: "Products", icon: Package },
+  { to: "/libani/categories", label: "Categories", icon: Tags },
+  { to: "/libani/brands", label: "Brands", icon: Building2 },
+  { to: "/libani/customers", label: "Customers", icon: Users },
+  { to: "/libani/finance", label: "Finance", icon: Wallet },
+  { to: "/libani/payments", label: "Payments", icon: CreditCard },
+  { to: "/libani/image-optimizer", label: "Image Optimizer", icon: ImageIcon },
+  { to: "/libani/seo", label: "SEO / AEO / GEO", icon: Sparkles },
+  { to: "/libani/settings", label: "Settings", icon: SettingsIcon },
 ];
 
 export function AdminLayout({ children, title }: { children: ReactNode; title: string }) {

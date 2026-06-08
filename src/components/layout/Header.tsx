@@ -196,7 +196,7 @@ export function Header() {
                   {isAdmin && (
                     <>
                       <DropdownMenuSeparator />
-                      <DropdownMenuItem asChild><Link to="/admin"><LayoutDashboard className="h-4 w-4 mr-2" /> Admin Dashboard</Link></DropdownMenuItem>
+                      <DropdownMenuItem asChild><Link to="/libani"><LayoutDashboard className="h-4 w-4 mr-2" /> Admin Dashboard</Link></DropdownMenuItem>
                     </>
                   )}
                   <DropdownMenuSeparator />
