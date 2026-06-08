@@ -54,7 +54,7 @@ export default function AdminDashboard() {
       <Card className="p-4">
         <div className="flex items-center justify-between mb-3">
           <h2 className="font-semibold">Recent Orders</h2>
-          <Link to="/admin/orders" className="text-sm text-primary hover:underline">View all</Link>
+          <Link to="/libani/orders" className="text-sm text-primary hover:underline">View all</Link>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
