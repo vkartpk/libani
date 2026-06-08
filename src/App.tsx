@@ -42,17 +42,17 @@ const AccountAddresses = lazy(() => import("./pages/account/Addresses"));
 const AccountProfile = lazy(() => import("./pages/account/Profile"));
 const AccountSecurity = lazy(() => import("./pages/account/Security"));
 const NotFound = lazy(() => import("./pages/NotFound"));
-const AdminDashboard = lazy(() => import("./pages/admin/Dashboard"));
-const AdminOrders = lazy(() => import("./pages/admin/Orders"));
-const AdminProducts = lazy(() => import("./pages/admin/Products"));
-const AdminCategories = lazy(() => import("./pages/admin/Categories"));
-const AdminBrands = lazy(() => import("./pages/admin/Brands"));
-const AdminCustomers = lazy(() => import("./pages/admin/Customers"));
-const AdminSeo = lazy(() => import("./pages/admin/Seo"));
-const AdminFinance = lazy(() => import("./pages/admin/Finance"));
-const AdminPayments = lazy(() => import("./pages/admin/Payments"));
-const AdminImageOptimizer = lazy(() => import("./pages/admin/ImageOptimizer"));
-const AdminSettings = lazy(() => import("./pages/admin/Settings"));
+const AdminDashboard = lazy(() => import("./pages/libani/Dashboard"));
+const AdminOrders = lazy(() => import("./pages/libani/Orders"));
+const AdminProducts = lazy(() => import("./pages/libani/Products"));
+const AdminCategories = lazy(() => import("./pages/libani/Categories"));
+const AdminBrands = lazy(() => import("./pages/libani/Brands"));
+const AdminCustomers = lazy(() => import("./pages/libani/Customers"));
+const AdminSeo = lazy(() => import("./pages/libani/Seo"));
+const AdminFinance = lazy(() => import("./pages/libani/Finance"));
+const AdminPayments = lazy(() => import("./pages/libani/Payments"));
+const AdminImageOptimizer = lazy(() => import("./pages/libani/ImageOptimizer"));
+const AdminSettings = lazy(() => import("./pages/libani/Settings"));
 
 const queryClient = new QueryClient();
 
@@ -100,17 +100,17 @@ const App = () => (
                         <Route path="/account/addresses" element={<AccountAddresses />} />
                         <Route path="/account/profile" element={<AccountProfile />} />
                         <Route path="/account/security" element={<AccountSecurity />} />
-                        <Route path="/admin" element={<AdminDashboard />} />
-                        <Route path="/admin/orders" element={<AdminOrders />} />
-                        <Route path="/admin/products" element={<AdminProducts />} />
-                        <Route path="/admin/categories" element={<AdminCategories />} />
-                        <Route path="/admin/brands" element={<AdminBrands />} />
-                        <Route path="/admin/customers" element={<AdminCustomers />} />
-                        <Route path="/admin/seo" element={<AdminSeo />} />
-                        <Route path="/admin/finance" element={<AdminFinance />} />
-                        <Route path="/admin/payments" element={<AdminPayments />} />
-                        <Route path="/admin/image-optimizer" element={<AdminImageOptimizer />} />
-                        <Route path="/admin/settings" element={<AdminSettings />} />
+                        <Route path="/libani" element={<AdminDashboard />} />
+                        <Route path="/libani/orders" element={<AdminOrders />} />
+                        <Route path="/libani/products" element={<AdminProducts />} />
+                        <Route path="/libani/categories" element={<AdminCategories />} />
+                        <Route path="/libani/brands" element={<AdminBrands />} />
+                        <Route path="/libani/customers" element={<AdminCustomers />} />
+                        <Route path="/libani/seo" element={<AdminSeo />} />
+                        <Route path="/libani/finance" element={<AdminFinance />} />
+                        <Route path="/libani/payments" element={<AdminPayments />} />
+                        <Route path="/libani/image-optimizer" element={<AdminImageOptimizer />} />
+                        <Route path="/libani/settings" element={<AdminSettings />} />
                         <Route path="*" element={<NotFound />} />
                       </Routes>
                     </Suspense>
