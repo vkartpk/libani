@@ -58,8 +58,7 @@ export default function Auth() {
         <div className="mt-6 bg-card border border-border rounded-lg p-6">
           {user ? (
             <div className="text-center"><p>Signed in as <strong>{user.email}</strong></p><Button onClick={signOut} variant="outline" className="mt-4">Sign out</Button></div>
-          ) : (
-          {recoveryMode ? (
+          ) : recoveryMode ? (
             <form onSubmit={rp.handleSubmit(onRecover)} className="space-y-4">
               <div className="space-y-1">
                 <h1 className="font-display text-xl font-bold">Reset password</h1>
@@ -96,7 +95,6 @@ export default function Auth() {
               </form>
             </TabsContent>
           </Tabs>
-          )}
           )}
         </div>
       </div>
