@@ -47,7 +47,7 @@ async function genImage(prompt: string): Promise<Buffer> {
     method: "POST",
     headers: { Authorization: `Bearer ${AI}`, "Content-Type": "application/json" },
     body: JSON.stringify({
-      model: "google/gemini-3.1-flash-image-preview",
+      model: "google/gemini-3.1-flash-image",
       prompt,
       size: "1024x1024",
       n: 1,
