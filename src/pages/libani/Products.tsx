@@ -10,7 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Plus, Pencil, Trash2 } from "lucide-react";
 import { toast } from "sonner";
-import { ImageUploader } from "@/components/admin/ImageUploader";
+import { ImageUploader } from "@/components/libani/ImageUploader";
 
 type Product = any;
 
