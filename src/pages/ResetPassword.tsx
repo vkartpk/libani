@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { SEO } from "@/components/SEO";
 import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
+
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
@@ -34,8 +36,8 @@ export default function ResetPassword() {
         <form onSubmit={submit} className="bg-card border border-border rounded-lg p-6 space-y-3">
           <h1 className="font-display text-xl font-bold">Set a new password</h1>
           {!ready && <p className="text-sm text-muted-foreground">If your reset link is expired or invalid, request a new link from the sign in page.</p>}
-          <div><Label>New password</Label><Input type="password" value={pw} onChange={(e) => setPw(e.target.value)} /></div>
-          <div><Label>Confirm password</Label><Input type="password" value={confirmPw} onChange={(e) => setConfirmPw(e.target.value)} /></div>
+          <div><Label>New password</Label><PasswordInput value={pw} onChange={(e) => setPw(e.target.value)} /></div>
+          <div><Label>Confirm password</Label><PasswordInput value={confirmPw} onChange={(e) => setConfirmPw(e.target.value)} /></div>
           <Button type="submit" className="w-full bg-primary hover:bg-primary/90 text-primary-foreground">Update password</Button>
           <Button type="button" variant="ghost" className="w-full" onClick={() => nav("/auth")}>Back to sign in</Button>
         </form>

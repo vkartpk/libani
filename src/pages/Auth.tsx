@@ -10,6 +10,8 @@ import { SEO } from "@/components/SEO";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
+
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
@@ -80,7 +82,7 @@ export default function Auth() {
             <TabsContent value="login">
               <form onSubmit={li.handleSubmit(onLogin)} className="space-y-3 mt-4">
                 <div><Label>Email</Label><Input type="email" {...li.register("email")} />{li.formState.errors.email && <p className="text-xs text-destructive mt-1">{li.formState.errors.email.message}</p>}</div>
-                <div><Label>Password</Label><Input type="password" {...li.register("password")} />{li.formState.errors.password && <p className="text-xs text-destructive mt-1">{li.formState.errors.password.message}</p>}</div>
+                <div><Label>Password</Label><PasswordInput {...li.register("password")} />{li.formState.errors.password && <p className="text-xs text-destructive mt-1">{li.formState.errors.password.message}</p>}</div>
                 <Button type="submit" className="w-full bg-primary hover:bg-primary/90 text-primary-foreground">Sign in</Button>
                 <Button type="button" variant="link" className="w-full h-auto p-0 text-sm" onClick={() => { rp.setValue("email", li.getValues("email") || ""); setRecoveryMode(true); }}>Forgot password?</Button>
               </form>
@@ -90,7 +92,7 @@ export default function Auth() {
                 <div><Label>Full name</Label><Input {...su.register("name")} />{su.formState.errors.name && <p className="text-xs text-destructive mt-1">{su.formState.errors.name.message}</p>}</div>
                 <div><Label>Email</Label><Input type="email" {...su.register("email")} />{su.formState.errors.email && <p className="text-xs text-destructive mt-1">{su.formState.errors.email.message}</p>}</div>
                 <div><Label>Phone</Label><Input {...su.register("phone")} />{su.formState.errors.phone && <p className="text-xs text-destructive mt-1">{su.formState.errors.phone.message}</p>}</div>
-                <div><Label>Password</Label><Input type="password" {...su.register("password")} />{su.formState.errors.password && <p className="text-xs text-destructive mt-1">{su.formState.errors.password.message}</p>}</div>
+                <div><Label>Password</Label><PasswordInput {...su.register("password")} />{su.formState.errors.password && <p className="text-xs text-destructive mt-1">{su.formState.errors.password.message}</p>}</div>
                 <Button type="submit" className="w-full bg-primary hover:bg-primary/90 text-primary-foreground">Create account</Button>
               </form>
             </TabsContent>
