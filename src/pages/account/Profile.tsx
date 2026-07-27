@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { AccountLayout } from "./AccountLayout";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";

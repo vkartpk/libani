@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { AdminLayout } from "./AdminLayout";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/contexts/AuthContext";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
