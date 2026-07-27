@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { AccountLayout } from "./AccountLayout";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/lib/supabase";
 import { formatPKR } from "@/lib/storage";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 

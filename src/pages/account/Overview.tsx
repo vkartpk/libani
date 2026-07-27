@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { AccountLayout } from "./AccountLayout";
 import { useAuth } from "@/contexts/AuthContext";
 import { useWishlist } from "@/contexts/WishlistContext";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/lib/supabase";
 import { formatPKR } from "@/lib/storage";
 
 export default function Overview() {

@@ -168,7 +168,7 @@ export const newArrivals = products.filter((p) => p.isNewArrival);
 // this array in place so that anything imported as `products` reflects the
 // admin-managed catalogue (including uploaded images).
 
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/lib/supabase";
 
 type DbRow = {
   id: string;

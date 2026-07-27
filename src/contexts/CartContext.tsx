@@ -3,7 +3,7 @@ import { safeStorage } from "@/lib/storage";
 import { products } from "@/data/products";
 import type { Product } from "@/data/types";
 import { useSiteSettings } from "@/hooks/useSiteSettings";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/lib/supabase";
 
 export type CartItem = {
   productId: string;
