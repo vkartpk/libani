@@ -4,7 +4,6 @@ import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { supabase } from "@/lib/supabase";
-import { lovable } from "@/integrations/lovable";
 import { useAuth } from "@/contexts/AuthContext";
 import { SEO } from "@/components/SEO";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
@@ -48,8 +47,11 @@ export default function Auth() {
   };
 
   const onGoogle = async () => {
-    const res = await lovable.auth.signInWithOAuth("google", { redirect_uri: `${window.location.origin}/` });
-    if (res.error) toast.error(res.error.message);
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: { redirectTo: `${window.location.origin}/` },
+    });
+    if (error) toast.error(error.message);
   };
 
   return (
