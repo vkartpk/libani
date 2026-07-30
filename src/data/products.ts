@@ -1,7 +1,27 @@
 import type { Product } from "./types";
+import imgRouterArcher from "@/assets/products/router-archer.jpg";
+import imgMeshWifi from "@/assets/products/mesh-wifi.jpg";
+import imgTwsEarbuds from "@/assets/products/tws-earbuds.jpg";
+import imgGamingHeadset from "@/assets/products/gaming-headset.jpg";
+import imgNeckband from "@/assets/products/neckband.jpg";
+import imgMechKeyboard from "@/assets/products/mech-keyboard.jpg";
+import imgPowerBank from "@/assets/products/power-bank.jpg";
+import imgSecurityCamera from "@/assets/products/security-camera.jpg";
 
 const img = (seed: string, w = 800, h = 800) =>
   `https://picsum.photos/seed/${seed}/${w}/${h}`;
+
+// Real product-relevant artwork for the deals shown on the homepage.
+const localImages: Record<string, string> = {
+  "tp-link-archer-c6-ac1200-dual-band-router": imgRouterArcher,
+  "tp-link-deco-m4-mesh-wi-fi-2-pack": imgMeshWifi,
+  "joyroom-jr-ts1-true-wireless-earbuds": imgTwsEarbuds,
+  "hyperx-cloud-ii-gaming-headphones": imgGamingHeadset,
+  "lenovo-he05-magnetic-neckband": imgNeckband,
+  "redragon-k552-mechanical-keyboard": imgMechKeyboard,
+  "joyroom-jr-t012-20000mah-power-bank": imgPowerBank,
+  "tp-link-tapo-c200-360-security-camera": imgSecurityCamera,
+};
 
 const slugify = (s: string) =>
   s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
@@ -123,7 +143,7 @@ export const products: Product[] = seeds.map((s, i) => {
     category: s.category,
     subcategory: s.subcategory ?? s.category,
     tags: s.tags ?? [s.brand, s.category],
-    images: [
+    images: localImages[slug] ? [localImages[slug]] : [
       img(`${id}-1`),
       img(`${id}-2`),
       img(`${id}-3`),
@@ -209,6 +229,7 @@ const arr = <T,>(v: unknown, fb: T[]): T[] => (Array.isArray(v) ? (v as T[]) : f
 const mapRow = (r: DbRow): Product => {
   const fallback = products.find((p) => p.slug === r.slug);
   const images = arr<string>(r.images, []).filter(Boolean);
+  if (localImages[r.slug]) images.length = 0;
   return {
     id: r.id,
     slug: r.slug,
