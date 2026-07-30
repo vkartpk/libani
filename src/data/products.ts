@@ -7,6 +7,10 @@ import imgNeckband from "@/assets/products/neckband.jpg";
 import imgMechKeyboard from "@/assets/products/mech-keyboard.jpg";
 import imgPowerBank from "@/assets/products/power-bank.jpg";
 import imgSecurityCamera from "@/assets/products/security-camera.jpg";
+import imgGamingMouse from "@/assets/products/gaming-mouse.jpg";
+import imgGamingMouse2 from "@/assets/products/gaming-mouse-2.jpg";
+import imgGamingHeadsetRed from "@/assets/products/gaming-headset-red.jpg";
+import imgCarCharger from "@/assets/products/car-charger.jpg";
 
 const img = (seed: string, w = 800, h = 800) =>
   `https://picsum.photos/seed/${seed}/${w}/${h}`;
@@ -21,6 +25,10 @@ const localImages: Record<string, string> = {
   "redragon-k552-mechanical-keyboard": imgMechKeyboard,
   "joyroom-jr-t012-20000mah-power-bank": imgPowerBank,
   "tp-link-tapo-c200-360-security-camera": imgSecurityCamera,
+  "redragon-m711-cobra-gaming-mouse": imgGamingMouse,
+  "bloody-v8m-gaming-mouse": imgGamingMouse2,
+  "redragon-h510-zeus-gaming-headphones": imgGamingHeadsetRed,
+  "amaze-cc-pd-car-fast-charger": imgCarCharger,
 };
 
 const slugify = (s: string) =>
