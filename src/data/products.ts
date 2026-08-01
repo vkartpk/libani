@@ -14,6 +14,12 @@ import imgCarCharger from "@/assets/products/car-charger.jpg";
 import imgSportEarbuds from "@/assets/products/sport-earbuds.jpg";
 import imgPowerStrip from "@/assets/products/power-strip.jpg";
 import imgUsbCharger from "@/assets/products/usb-charger.jpg";
+import imgRouterTenda from "@/assets/products/router-tenda.jpg";
+import imgRouter4g from "@/assets/products/router-4g-lte.jpg";
+import imgTwsLp40 from "@/assets/products/tws-lp40.jpg";
+import imgTwsBowie from "@/assets/products/tws-bowie.jpg";
+import imgHeadphonesWireless from "@/assets/products/headphones-wireless.jpg";
+import imgHeadphonesTh10 from "@/assets/products/headphones-th10.jpg";
 
 const img = (seed: string, w = 800, h = 800) =>
   `https://picsum.photos/seed/${seed}/${w}/${h}`;
@@ -35,6 +41,12 @@ const localImages: Record<string, string> = {
   "ldnio-t05-sport-earbuds": imgSportEarbuds,
   "ldnio-sc5614-6-outlet-power-strip": imgPowerStrip,
   "ldnio-a4808q-4-port-usb-charger": imgUsbCharger,
+  "tenda-ac10-1200mbps-smart-router": imgRouterTenda,
+  "mt-link-4g-lte-wireless-router": imgRouter4g,
+  "lenovo-lp40-pro-wireless-earbuds": imgTwsLp40,
+  "baseus-bowie-wx5-tws-earbuds": imgTwsBowie,
+  "joyroom-jr-hl2-wireless-headphones": imgHeadphonesWireless,
+  "lenovo-th10-over-ear-headphones": imgHeadphonesTh10,
 };
 
 const slugify = (s: string) =>
