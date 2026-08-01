@@ -20,6 +20,32 @@ import imgTwsLp40 from "@/assets/products/tws-lp40.jpg";
 import imgTwsBowie from "@/assets/products/tws-bowie.jpg";
 import imgHeadphonesWireless from "@/assets/products/headphones-wireless.jpg";
 import imgHeadphonesTh10 from "@/assets/products/headphones-th10.jpg";
+import imgMouseSilent from "@/assets/products/mouse-silent-wireless.jpg";
+import imgMouseOffice from "@/assets/products/mouse-wireless-office.jpg";
+import imgMouseWired from "@/assets/products/mouse-wired.jpg";
+import imgKeyboardOffice from "@/assets/products/keyboard-office.jpg";
+import imgUsbSpeakers from "@/assets/products/usb-speakers.jpg";
+import imgPowerBankSlim from "@/assets/products/power-bank-slim.jpg";
+import imgPowerBankWireless from "@/assets/products/power-bank-wireless.jpg";
+import imgLaptopStand from "@/assets/products/laptop-stand.jpg";
+import imgLaptopBackpack from "@/assets/products/laptop-backpack.jpg";
+import imgWebcam from "@/assets/products/webcam.jpg";
+import imgUsbMic from "@/assets/products/usb-microphone.jpg";
+import imgPortableDrive from "@/assets/products/portable-drive.jpg";
+import imgPrinter from "@/assets/products/printer.jpg";
+import imgSmartWatch from "@/assets/products/smart-watch.jpg";
+import imgTvBox from "@/assets/products/tv-box.jpg";
+import imgGraphicTablet from "@/assets/products/graphic-tablet.jpg";
+import imgHeadsetStinger from "@/assets/products/gaming-headset-stinger.jpg";
+import imgKeyboard60Rgb from "@/assets/products/keyboard-60-rgb.jpg";
+import imgKeyboardGamingBlue from "@/assets/products/keyboard-gaming-blue.jpg";
+import imgGamepad from "@/assets/products/gamepad.jpg";
+import imgGamingMousepad from "@/assets/products/gaming-mousepad.jpg";
+import imgGamingChair from "@/assets/products/gaming-chair.jpg";
+import imgUsbcCable from "@/assets/products/usbc-cable.jpg";
+import imgLightningCable from "@/assets/products/lightning-cable.jpg";
+import imgUsbcHub from "@/assets/products/usbc-hub.jpg";
+import imgWiredEarphones from "@/assets/products/wired-earphones.jpg";
 
 const img = (seed: string, w = 800, h = 800) =>
   `https://picsum.photos/seed/${seed}/${w}/${h}`;
@@ -47,6 +73,32 @@ const localImages: Record<string, string> = {
   "baseus-bowie-wx5-tws-earbuds": imgTwsBowie,
   "joyroom-jr-hl2-wireless-headphones": imgHeadphonesWireless,
   "lenovo-th10-over-ear-headphones": imgHeadphonesTh10,
+  "amaze-am-m9-silent-wireless-mouse": imgMouseSilent,
+  "logitech-m170-wireless-mouse": imgMouseOffice,
+  "a4tech-op-720-wired-mouse": imgMouseWired,
+  "a4tech-kr-83-comfort-keyboard": imgKeyboardOffice,
+  "havit-sk202-usb-speakers": imgUsbSpeakers,
+  "amaze-10000mah-slim-power-bank": imgPowerBankSlim,
+  "lenovo-pb500-wireless-power-bank": imgPowerBankWireless,
+  "amaze-al-stand-aluminium-laptop-stand": imgLaptopStand,
+  "amaze-pro-laptop-backpack-15-6": imgLaptopBackpack,
+  "logitech-c270-hd-webcam": imgWebcam,
+  "hyperx-solocast-usb-microphone": imgUsbMic,
+  "wd-elements-1tb-portable-drive": imgPortableDrive,
+  "hp-deskjet-2710-all-in-one-printer": imgPrinter,
+  "xiaomi-redmi-watch-4": imgSmartWatch,
+  "xiaomi-mi-tv-box-s-4k": imgTvBox,
+  "wacom-one-ctl-472-graphic-tablet": imgGraphicTablet,
+  "hyperx-cloud-stinger-core-gaming-headset": imgHeadsetStinger,
+  "redragon-k530-draconic-60-mechanical": imgKeyboard60Rgb,
+  "t-dagger-bali-tgk315-gaming-keyboard": imgKeyboardGamingBlue,
+  "redragon-g808-pro-gamepad": imgGamepad,
+  "redragon-p016-suzaku-gaming-mousepad-xxl": imgGamingMousepad,
+  "redragon-coeus-gc-101-gaming-chair": imgGamingChair,
+  "joyroom-s-1030n1-usb-c-100w-cable-1m": imgUsbcCable,
+  "baseus-tungsten-gold-lightning-cable-2m": imgLightningCable,
+  "compro-usb-c-7-in-1-hub": imgUsbcHub,
+  "joyroom-jr-d7-wired-earphones": imgWiredEarphones,
 };
 
 const slugify = (s: string) =>
