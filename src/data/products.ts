@@ -11,6 +11,9 @@ import imgGamingMouse from "@/assets/products/gaming-mouse.jpg";
 import imgGamingMouse2 from "@/assets/products/gaming-mouse-2.jpg";
 import imgGamingHeadsetRed from "@/assets/products/gaming-headset-red.jpg";
 import imgCarCharger from "@/assets/products/car-charger.jpg";
+import imgSportEarbuds from "@/assets/products/sport-earbuds.jpg";
+import imgPowerStrip from "@/assets/products/power-strip.jpg";
+import imgUsbCharger from "@/assets/products/usb-charger.jpg";
 
 const img = (seed: string, w = 800, h = 800) =>
   `https://picsum.photos/seed/${seed}/${w}/${h}`;
@@ -29,6 +32,9 @@ const localImages: Record<string, string> = {
   "bloody-v8m-gaming-mouse": imgGamingMouse2,
   "redragon-h510-zeus-gaming-headphones": imgGamingHeadsetRed,
   "amaze-cc-pd-car-fast-charger": imgCarCharger,
+  "ldnio-t05-sport-earbuds": imgSportEarbuds,
+  "ldnio-sc5614-6-outlet-power-strip": imgPowerStrip,
+  "ldnio-a4808q-4-port-usb-charger": imgUsbCharger,
 };
 
 const slugify = (s: string) =>
