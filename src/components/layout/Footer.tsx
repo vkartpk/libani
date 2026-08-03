@@ -1,8 +1,9 @@
 import { Link } from "react-router-dom";
-import { Facebook, Instagram, Youtube, Linkedin, Truck, Clock, Zap, Lock, Phone, Mail, MapPin } from "lucide-react";
+import { Facebook, Instagram, Youtube, Linkedin, Truck, Clock, Lock, Phone, Mail, MapPin } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import libaniLogo from "@/assets/libani-logo.png";
 
 const trust = [
   { icon: Truck, label: "Free Shipping above Rs.1000" },
@@ -26,7 +27,16 @@ export function Footer() {
 
       <div className="container-x py-12 grid md:grid-cols-3 gap-10">
         <div>
-          <Link to="/" className="font-display font-bold text-2xl">Tech<span className="text-primary">Zone</span></Link>
+          <Link to="/" className="inline-block">
+            <img
+              src={libaniLogo}
+              alt="libani"
+              width={130}
+              height={45}
+              className="h-9 w-auto"
+              loading="lazy"
+            />
+          </Link>
           <p className="mt-3 text-sm text-muted-foreground max-w-sm">Pakistan's premier destination for authentic computer peripherals, mobile accessories, gaming gear, and audio products.</p>
           <div className="mt-4 flex gap-2">
             {[Facebook, Instagram, Youtube, Linkedin].map((Icon, i) => (
@@ -74,7 +84,7 @@ export function Footer() {
 
       <div className="border-t border-border">
         <div className="container-x py-4 flex flex-col md:flex-row items-center justify-between gap-3 text-xs text-muted-foreground">
-          <p>© {new Date().getFullYear()} TechZone. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} libani. All rights reserved.</p>
           <div className="flex items-center gap-2">
             {["VISA","Mastercard","JazzCash","EasyPaisa","COD"].map((m) => (
               <span key={m} className="px-2 py-1 rounded bg-surface text-[10px] font-bold tracking-wider">{m}</span>
