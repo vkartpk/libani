@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Facebook, Instagram, Youtube, Linkedin, Truck, Clock, Lock, Phone, Mail, MapPin } from "lucide-react";
+import { Facebook, Instagram, Youtube, Linkedin, Truck, Clock, Zap, Lock, Phone, Mail, MapPin } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
