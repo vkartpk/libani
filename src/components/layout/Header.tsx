@@ -46,8 +46,8 @@ export function Header() {
         <div className="hidden lg:block border-b border-border/50 bg-card/50">
           <div className="container-x flex items-center justify-between py-1.5 text-xs text-muted-foreground">
             <div className="flex items-center gap-4">
-              <a href="tel:+923000000000" className="flex items-center gap-1 hover:text-foreground"><Phone className="h-3 w-3" /> +92 300 0000000</a>
-              <a href="mailto:hello@techzone.pk" className="flex items-center gap-1 hover:text-foreground"><Mail className="h-3 w-3" /> hello@techzone.pk</a>
+              <a href="tel:+923124339986" className="flex items-center gap-1 hover:text-foreground"><Phone className="h-3 w-3" /> +92 3124339986</a>
+              <a href="mailto:libaniofficial@gmail.com" className="flex items-center gap-1 hover:text-foreground"><Mail className="h-3 w-3" /> libaniofficial@gmail.com</a>
             </div>
             <div className="flex items-center gap-4">
               <Link to="/track-order" className="hover:text-foreground">Track Order</Link>
