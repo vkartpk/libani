@@ -31,9 +31,9 @@ export function Footer() {
             <img
               src={libaniLogo}
               alt="libani"
-              width={130}
-              height={45}
-              className="h-9 w-auto"
+              width={180}
+              height={63}
+              className="h-12 w-auto"
               loading="lazy"
             />
           </Link>
