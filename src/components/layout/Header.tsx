@@ -114,9 +114,9 @@ export function Header() {
             <img
               src={libaniLogo}
               alt="libani"
-              width={115}
-              height={40}
-              className="h-8 w-auto"
+              width={160}
+              height={56}
+              className="h-10 w-auto"
               loading="eager"
             />
           </Link>
