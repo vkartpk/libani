@@ -57,9 +57,9 @@ export default function Contact() {
             )}
           </div>
           <div className="space-y-3 text-sm">
-            <div className="flex items-center gap-2"><Phone className="h-4 w-4 text-primary" /> <a href="tel:+923000000000" className="hover:text-primary">+92 300 0000000</a></div>
-            <div className="flex items-center gap-2"><Mail className="h-4 w-4 text-primary" /> <a href="mailto:hello@techzone.pk" className="hover:text-primary">hello@techzone.pk</a></div>
-            <div className="flex items-start gap-2"><MapPin className="h-4 w-4 text-primary mt-0.5" /> Plot 42, Tech Plaza, Karachi, Pakistan</div>
+            <div className="flex items-center gap-2"><Phone className="h-4 w-4 text-primary" /> <a href="tel:+923124339986" className="hover:text-primary">+92 3124339986</a></div>
+            <div className="flex items-center gap-2"><Mail className="h-4 w-4 text-primary" /> <a href="mailto:libaniofficial@gmail.com" className="hover:text-primary">libaniofficial@gmail.com</a></div>
+            <div className="flex items-start gap-2"><MapPin className="h-4 w-4 text-primary mt-0.5" /> IT Tower, Gulberg, Lahore. Pakistan</div>
             <p className="text-muted-foreground">Mon–Sat 10:00 – 19:00</p>
           </div>
         </div>

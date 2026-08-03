@@ -31,9 +31,9 @@ export function Footer() {
             <img
               src={libaniLogo}
               alt="libani"
-              width={180}
-              height={63}
-              className="h-12 w-auto"
+              width={220}
+              height={77}
+              className="h-14 w-auto"
               loading="lazy"
             />
           </Link>
@@ -66,9 +66,9 @@ export function Footer() {
         <div>
           <h3 className="font-display font-bold text-base mb-4">Get in Touch</h3>
           <ul className="space-y-2 text-sm text-muted-foreground">
-            <li className="flex items-center gap-2"><Phone className="h-4 w-4 text-primary" /> +92 300 0000000</li>
-            <li className="flex items-center gap-2"><Mail className="h-4 w-4 text-primary" /> hello@techzone.pk</li>
-            <li className="flex items-start gap-2"><MapPin className="h-4 w-4 text-primary mt-0.5" /> Plot 42, Tech Plaza, Karachi, Pakistan</li>
+            <li className="flex items-center gap-2"><Phone className="h-4 w-4 text-primary" /> +92 3124339986</li>
+            <li className="flex items-center gap-2"><Mail className="h-4 w-4 text-primary" /> libaniofficial@gmail.com</li>
+            <li className="flex items-start gap-2"><MapPin className="h-4 w-4 text-primary mt-0.5" /> IT Tower, Gulberg, Lahore. Pakistan</li>
             <li>Mon–Sat 10:00 – 19:00</li>
           </ul>
           <form
