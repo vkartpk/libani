@@ -1,5 +1,5 @@
 import { Link, NavLink } from "react-router-dom";
-import { Heart, Search, ShoppingCart, User, Menu, Zap, Phone, Mail, ChevronDown, LayoutDashboard, LogOut, UserCircle } from "lucide-react";
+import { Heart, Search, ShoppingCart, User, Menu, Phone, Mail, ChevronDown, LayoutDashboard, LogOut, UserCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
@@ -13,6 +13,7 @@ import { SearchOverlay } from "@/components/SearchOverlay";
 import { categories, gamingCategories } from "@/data/categories";
 import { brands } from "@/data/brands";
 import { cn } from "@/lib/utils";
+import libaniLogo from "@/assets/libani-logo.png";
 
 function MegaMenuTrigger({ label, children }: { label: string; children: React.ReactNode }) {
   return (
@@ -109,11 +110,15 @@ export function Header() {
           </Sheet>
 
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-1.5 shrink-0">
-            <span className="grid place-items-center h-8 w-8 rounded bg-primary text-primary-foreground"><Zap className="h-4 w-4" /></span>
-            <span className="font-display font-bold text-lg sm:text-xl tracking-tight">
-              Tech<span className="text-primary">Zone</span>
-            </span>
+          <Link to="/" className="flex items-center shrink-0">
+            <img
+              src={libaniLogo}
+              alt="libani"
+              width={115}
+              height={40}
+              className="h-8 w-auto"
+              loading="eager"
+            />
           </Link>
 
           {/* Desktop nav */}
