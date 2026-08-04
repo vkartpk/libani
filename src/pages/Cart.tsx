@@ -15,7 +15,7 @@ export default function Cart() {
 
   return (
     <>
-      <SEO title="Cart | TechZone" description="Review your cart and checkout securely." />
+      <SEO title="Cart | libani" description="Review your cart and checkout securely." />
       <div className="container-x py-6">
         <Breadcrumbs items={[{ label: "Home", to: "/" }, { label: "Cart" }]} />
         <h1 className="font-display text-2xl md:text-3xl font-bold mt-4">Your Cart</h1>

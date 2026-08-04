@@ -84,7 +84,7 @@ export default function Checkout() {
 
   return (
     <>
-      <SEO title="Checkout | TechZone" />
+      <SEO title="Checkout | libani" />
       <div className="container-x py-6">
         <Breadcrumbs items={[{ label: "Home", to: "/" }, { label: "Cart", to: "/cart" }, { label: "Checkout" }]} />
         <h1 className="font-display text-2xl md:text-3xl font-bold mt-4">Checkout</h1>
@@ -123,7 +123,7 @@ export default function Checkout() {
                 <RadioGroup value={pay} onValueChange={setPay} className="space-y-2">
                   {[
                     { v: "cod", t: "Cash on Delivery", d: "Pay when your order arrives." },
-                    { v: "bank", t: "Bank Transfer", d: "Acct: TechZone Pvt Ltd · Meezan Bank · 0123-4567890" },
+                    { v: "bank", t: "Bank Transfer", d: "Acct: libani Pvt Ltd · Meezan Bank · 0123-4567890" },
                     { v: "jc", t: "JazzCash / EasyPaisa", d: "We'll send you a payment link via SMS." },
                   ].map((o) => (
                     <Label key={o.v} className="flex gap-3 p-3 border border-border rounded cursor-pointer hover:border-primary">

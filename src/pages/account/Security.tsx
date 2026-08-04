@@ -31,7 +31,7 @@ export default function Security() {
         </form>
         <div className="bg-card border border-border rounded-lg p-6">
           <h2 className="font-display font-bold mb-2">Sign out</h2>
-          <Button variant="outline" onClick={async () => { await signOut(); nav("/"); }}>Sign out of TechZone</Button>
+          <Button variant="outline" onClick={async () => { await signOut(); nav("/"); }}>Sign out of libani</Button>
         </div>
       </div>
     </AccountLayout>

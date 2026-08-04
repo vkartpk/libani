@@ -22,7 +22,7 @@ export function AccountLayout({ children }: { children: ReactNode }) {
 
   return (
     <>
-      <SEO title="My Account | TechZone" />
+      <SEO title="My Account | libani" />
       <div className="container-x py-6">
         <Breadcrumbs items={[{ label: "Home", to: "/" }, { label: "My Account" }]} />
         <h1 className="font-display text-2xl md:text-3xl font-bold mt-4 mb-6">My Account</h1>

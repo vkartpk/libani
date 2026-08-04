@@ -56,7 +56,7 @@ export default function Auth() {
 
   return (
     <>
-      <SEO title="Sign in | TechZone" />
+      <SEO title="Sign in | libani" />
       <div className="container-x py-6 max-w-md">
         <Breadcrumbs items={[{ label: "Home", to: "/" }, { label: "Account" }]} />
         <div className="mt-6 bg-card border border-border rounded-lg p-6">

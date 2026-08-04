@@ -16,7 +16,7 @@ export default function Compare() {
   if (items.length === 0) {
     return (
       <div className="container-x py-12 text-center">
-        <SEO title="Compare | TechZone" />
+        <SEO title="Compare | libani" />
         <h1 className="font-display text-2xl font-bold mb-4">Nothing to compare yet</h1>
         <p className="text-muted-foreground mb-6">Pick up to 4 products from any product card to compare them side-by-side.</p>
         <Button asChild className="bg-primary hover:bg-primary/90 text-primary-foreground"><Link to="/products">Browse products</Link></Button>
@@ -29,7 +29,7 @@ export default function Compare() {
 
   return (
     <>
-      <SEO title="Compare products | TechZone" />
+      <SEO title="Compare products | libani" />
       <div className="container-x py-6">
         <Breadcrumbs items={[{ label: "Home", to: "/" }, { label: "Compare" }]} />
         <div className="flex items-center justify-between mt-4 mb-6">

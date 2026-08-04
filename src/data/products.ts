@@ -248,8 +248,8 @@ export const products: Product[] = seeds.map((s, i) => {
     sku: `TZ-${id.toUpperCase()}`,
     weight: "0.5 kg",
     freeShipping: s.price >= 1000,
-    metaTitle: `${s.name} | TechZone`,
-    metaDescription: `Buy ${s.name} online in Pakistan at TechZone. Genuine product, free shipping above Rs.1000, cash on delivery available.`,
+    metaTitle: `${s.name} | libani`,
+    metaDescription: `Buy ${s.name} online in Pakistan at libani. Genuine product, free shipping above Rs.1000, cash on delivery available.`,
   };
 });
 
@@ -333,11 +333,11 @@ const mapRow = (r: DbRow): Product => {
     sku: r.sku ?? fallback?.sku ?? `TZ-${r.slug.toUpperCase()}`,
     weight: r.weight ?? fallback?.weight ?? "0.5 kg",
     freeShipping: !!r.free_shipping,
-    metaTitle: r.meta_title ?? fallback?.metaTitle ?? `${r.name} | TechZone`,
+    metaTitle: r.meta_title ?? fallback?.metaTitle ?? `${r.name} | libani`,
     metaDescription:
       r.meta_description ??
       fallback?.metaDescription ??
-      `Buy ${r.name} online in Pakistan at TechZone.`,
+      `Buy ${r.name} online in Pakistan at libani.`,
   };
 };
 

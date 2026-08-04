@@ -35,7 +35,7 @@ export default function TrackOrder() {
 
   return (
     <>
-      <SEO title="Track Order | TechZone" />
+      <SEO title="Track Order | libani" />
       <div className="container-x py-6 max-w-2xl">
         <Breadcrumbs items={[{ label: "Home", to: "/" }, { label: "Track Order" }]} />
         <div className="mt-6 bg-card border border-border rounded-lg p-6 md:p-8">
