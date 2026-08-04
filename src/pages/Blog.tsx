@@ -11,7 +11,7 @@ export default function Blog() {
   const items = cat === "All" ? blogPosts : blogPosts.filter((p) => p.category === cat);
   return (
     <>
-      <SEO title="Blog | TechZone" description="Reviews, guides, news and tips from the TechZone team." />
+      <SEO title="Blog | libani" description="Reviews, guides, news and tips from the libani team." />
       <div className="container-x py-6">
         <Breadcrumbs items={[{ label: "Home", to: "/" }, { label: "Blog" }]} />
         <h1 className="font-display text-2xl md:text-3xl font-bold mt-4">From the Blog</h1>

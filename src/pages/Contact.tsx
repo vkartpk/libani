@@ -26,7 +26,7 @@ export default function Contact() {
   const { register, handleSubmit, setValue, formState: { errors } } = useForm<Form>({ resolver: zodResolver(schema) });
   return (
     <>
-      <SEO title="Contact | TechZone" />
+      <SEO title="Contact | libani" />
       <div className="container-x py-6">
         <Breadcrumbs items={[{ label: "Home", to: "/" }, { label: "Contact" }]} />
         <h1 className="font-display text-2xl md:text-3xl font-bold mt-4">Get in Touch</h1>

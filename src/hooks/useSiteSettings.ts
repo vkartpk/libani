@@ -37,7 +37,7 @@ export type SiteSettings = {
 };
 
 const DEFAULTS: SiteSettings = {
-  site_name: "TechZone",
+  site_name: "libani",
   tagline: null,
   support_phone: null,
   support_email: null,

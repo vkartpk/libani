@@ -33,7 +33,7 @@ export default function FAQ() {
   };
   return (
     <>
-      <SEO title="FAQ | TechZone" jsonLd={ld} />
+      <SEO title="FAQ | libani" jsonLd={ld} />
       <div className="container-x py-6 max-w-3xl">
         <Breadcrumbs items={[{ label: "Home", to: "/" }, { label: "FAQ" }]} />
         <h1 className="font-display text-2xl md:text-3xl font-bold mt-4">Frequently Asked Questions</h1>

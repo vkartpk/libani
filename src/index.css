@@ -8,7 +8,7 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    /* TechZone — Dark theme always on */
+    /* libani — Dark theme always on */
     --background: 0 0% 5%;        /* #0D0D0D */
     --foreground: 0 0% 100%;      /* #FFFFFF */
 

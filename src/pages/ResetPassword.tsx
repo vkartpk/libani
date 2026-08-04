@@ -31,7 +31,7 @@ export default function ResetPassword() {
   };
   return (
     <>
-      <SEO title="Reset password | TechZone" />
+      <SEO title="Reset password | libani" />
       <div className="container-x py-8 max-w-md">
         <form onSubmit={submit} className="bg-card border border-border rounded-lg p-6 space-y-3">
           <h1 className="font-display text-xl font-bold">Set a new password</h1>

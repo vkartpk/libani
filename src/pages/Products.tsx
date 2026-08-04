@@ -71,7 +71,7 @@ export default function Products({ title = "All Products", preset, description }
 
   return (
     <>
-      <SEO title={`${title} | TechZone`} description={description ?? `Browse ${title.toLowerCase()} at TechZone Pakistan.`} />
+      <SEO title={`${title} | libani`} description={description ?? `Browse ${title.toLowerCase()} at libani Pakistan.`} />
       <div className="container-x py-6">
         <Breadcrumbs items={[{ label: "Home", to: "/" }, { label: title }]} />
         <h1 className="font-display text-2xl md:text-3xl font-bold mt-4">{title}</h1>

@@ -12,7 +12,7 @@ export default function Wishlist() {
   const items = ids.map((id) => products.find((p) => p.id === id)).filter(Boolean);
   return (
     <>
-      <SEO title="Wishlist | TechZone" />
+      <SEO title="Wishlist | libani" />
       <div className="container-x py-6">
         <Breadcrumbs items={[{ label: "Home", to: "/" }, { label: "Wishlist" }]} />
         <h1 className="font-display text-2xl md:text-3xl font-bold mt-4">Your Wishlist</h1>

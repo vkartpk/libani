@@ -14,11 +14,11 @@ import { NewsletterBanner } from "@/components/home/NewsletterBanner";
 const Index = () => (
   <>
     <SEO
-      title="TechZone — Premium Tech Accessories in Pakistan"
+      title="libani — Premium Tech Accessories in Pakistan"
       description="Shop authentic computer peripherals, gaming gear, mobile accessories, audio, networking, and power gear. Free shipping above Rs.1000."
       jsonLd={[
-        { "@context": "https://schema.org", "@type": "Organization", name: "TechZone", url: typeof window !== "undefined" ? window.location.origin : "" },
-        { "@context": "https://schema.org", "@type": "WebSite", name: "TechZone", url: typeof window !== "undefined" ? window.location.origin : "" },
+        { "@context": "https://schema.org", "@type": "Organization", name: "libani", url: typeof window !== "undefined" ? window.location.origin : "" },
+        { "@context": "https://schema.org", "@type": "WebSite", name: "libani", url: typeof window !== "undefined" ? window.location.origin : "" },
       ]}
     />
     <HeroSlider />
