@@ -5,7 +5,7 @@ import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/
 const groups = [
   { title: "Orders & Shipping", items: [
     ["How long does delivery take?", "We deliver within 2-3 working days across Pakistan."],
-    ["Do you offer free shipping?", "Yes — free shipping on orders above Rs.1000."],
+    ["Do you charge for delivery?", "Yes — delivery charges apply on every order and are payable when we deliver."],
     ["Can I track my order?", "Yes, use our Track Order page with your order number."],
     ["Do you deliver outside Pakistan?", "Currently we serve Pakistan only."],
   ]},

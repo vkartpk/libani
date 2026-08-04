@@ -4,15 +4,17 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import libaniLogo from "@/assets/libani-logo.png";
-
-const trust = [
-  { icon: Truck, label: "Free Shipping above Rs.1000" },
-  { icon: Clock, label: "24/7 Customer Support" },
-  { icon: Zap, label: "Fast Delivery 2-3 Days" },
-  { icon: Lock, label: "Secure Checkout" },
-];
+import { useSiteSettings } from "@/hooks/useSiteSettings";
+import { formatPKR } from "@/lib/storage";
 
 export function Footer() {
+  const { settings } = useSiteSettings();
+  const trust = [
+    { icon: Truck, label: `Delivery charges ${formatPKR(Number(settings.shipping_fee || 0))}` },
+    { icon: Clock, label: "24/7 Customer Support" },
+    { icon: Zap, label: `Fast Delivery ${settings.delivery_days_min}-${settings.delivery_days_max} Days` },
+    { icon: Lock, label: "Secure Checkout" },
+  ];
   return (
     <footer className="bg-card border-t border-border mt-12">
       {/* Trust badges */}

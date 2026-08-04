@@ -166,7 +166,7 @@ export default function Checkout() {
               </div>
               <div className="mt-4 pt-4 border-t border-border space-y-2 text-sm">
                 <div className="flex justify-between"><span className="text-muted-foreground">Subtotal</span><span className="price">{formatPKR(subtotal)}</span></div>
-                <div className="flex justify-between"><span className="text-muted-foreground">Shipping</span><span className="price">{shipping === 0 ? "Free" : formatPKR(shipping)}</span></div>
+                <div className="flex justify-between"><span className="text-muted-foreground">Delivery charges</span><span className="price">{formatPKR(shipping)}</span></div>
                 {discount > 0 && <div className="flex justify-between text-success"><span>Discount</span><span className="price">-{formatPKR(discount)}</span></div>}
                 <div className="flex justify-between text-lg pt-2 border-t border-border"><span className="font-bold">Total</span><span className="price font-bold">{formatPKR(total)}</span></div>
               </div>

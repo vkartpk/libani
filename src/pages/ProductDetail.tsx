@@ -106,7 +106,7 @@ export default function ProductDetail() {
             </div>
 
             <div className="mt-6 grid grid-cols-2 gap-3 text-xs text-muted-foreground">
-              {[[Truck,"Free shipping above Rs.1000"],[Zap,"Delivered in 2-3 days"],[RefreshCw,"7-day easy returns"],[Lock,"Secure payment"]].map(([Ic, t], i) => (
+              {[[Truck,"Delivery charges apply"],[Zap,"Delivered in 2-3 days"],[RefreshCw,"7-day easy returns"],[Lock,"Secure payment"]].map(([Ic, t], i) => (
                 <div key={i} className="flex items-center gap-2"><Ic className="h-4 w-4 text-primary" /> {t as string}</div>
               ))}
             </div>

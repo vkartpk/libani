@@ -238,7 +238,7 @@ export const products: Product[] = seeds.map((s, i) => {
     features: s.features ?? [
       "Premium build quality",
       "Backed by official warranty",
-      "Free shipping above Rs.1000",
+      "Delivery charges payable on delivery",
       "Cash on delivery available",
     ],
     specs: baseSpecs(s),
@@ -247,9 +247,9 @@ export const products: Product[] = seeds.map((s, i) => {
     isOnSale: !!s.isOnSale || compareAtPrice !== null,
     sku: `TZ-${id.toUpperCase()}`,
     weight: "0.5 kg",
-    freeShipping: s.price >= 1000,
+    freeShipping: false,
     metaTitle: `${s.name} | libani`,
-    metaDescription: `Buy ${s.name} online in Pakistan at libani. Genuine product, free shipping above Rs.1000, cash on delivery available.`,
+    metaDescription: `Buy ${s.name} online in Pakistan at libani. Genuine product, fast nationwide delivery, cash on delivery available.`,
   };
 });
 

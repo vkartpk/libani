@@ -173,7 +173,7 @@ function DeliveryTab() {
         <h3 className="font-semibold mb-3">Delivery</h3>
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
           <Field label="Shipping fee"><Input type="number" value={form.shipping_fee ?? 0} onChange={(e) => set("shipping_fee", Number(e.target.value))} /></Field>
-          <Field label="Free shipping above"><Input type="number" value={form.free_shipping_threshold ?? 0} onChange={(e) => set("free_shipping_threshold", Number(e.target.value))} /></Field>
+          <Field label="Free delivery above (0 = never free)"><Input type="number" value={form.free_shipping_threshold ?? 0} onChange={(e) => set("free_shipping_threshold", Number(e.target.value))} /></Field>
           <Field label="COD fee"><Input type="number" value={form.cod_fee ?? 0} onChange={(e) => set("cod_fee", Number(e.target.value))} /></Field>
           <Field label="Min delivery days"><Input type="number" value={form.delivery_days_min ?? 2} onChange={(e) => set("delivery_days_min", Number(e.target.value))} /></Field>
           <Field label="Max delivery days"><Input type="number" value={form.delivery_days_max ?? 5} onChange={(e) => set("delivery_days_max", Number(e.target.value))} /></Field>
@@ -200,7 +200,7 @@ function OffersTab() {
             <span>{form.announcement_enabled ? "Enabled" : "Disabled"}</span>
           </div>
         </div>
-        <Field label="Message"><Input value={form.announcement_text || ""} onChange={(e) => set("announcement_text", e.target.value)} placeholder="Free shipping above Rs.1000 • Authentic Products" /></Field>
+        <Field label="Message"><Input value={form.announcement_text || ""} onChange={(e) => set("announcement_text", e.target.value)} placeholder="Fast nationwide delivery • Authentic Products" /></Field>
         <Field label="Optional link"><Input value={form.announcement_link || ""} onChange={(e) => set("announcement_link", e.target.value)} placeholder="/products" /></Field>
         <Button onClick={() => save(["announcement_enabled","announcement_text","announcement_link"])}>Save announcement</Button>
       </Card>
