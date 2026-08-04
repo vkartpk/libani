@@ -1,13 +1,15 @@
 import { Truck, Check, RefreshCw, MessageCircle } from "lucide-react";
-
-const items = [
-  { icon: Truck, title: "Free Shipping", desc: "On orders above Rs.1000" },
-  { icon: Check, title: "Genuine Products", desc: "100% authentic" },
-  { icon: RefreshCw, title: "Easy Returns", desc: "7-day return window" },
-  { icon: MessageCircle, title: "24/7 Support", desc: "We're always here" },
-];
+import { useSiteSettings } from "@/hooks/useSiteSettings";
+import { formatPKR } from "@/lib/storage";
 
 export function TrustBadges() {
+  const { settings } = useSiteSettings();
+  const items = [
+    { icon: Truck, title: "Nationwide Delivery", desc: `Flat ${formatPKR(Number(settings.shipping_fee || 0))} delivery charges` },
+    { icon: Check, title: "Genuine Products", desc: "100% authentic" },
+    { icon: RefreshCw, title: "Easy Returns", desc: "7-day return window" },
+    { icon: MessageCircle, title: "24/7 Support", desc: "We're always here" },
+  ];
   return (
     <section className="container-x mt-10">
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">

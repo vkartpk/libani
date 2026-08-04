@@ -4,12 +4,11 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Minus, Plus, Trash2, ShoppingBag } from "lucide-react";
 import { formatPKR } from "@/lib/storage";
-import { Progress } from "@/components/ui/progress";
+import { useSiteSettings } from "@/hooks/useSiteSettings";
 
 export function CartDrawer() {
-  const { drawerOpen, setDrawerOpen, enriched, setQty, remove, subtotal, count } = useCart();
-  const freeShipTarget = 1000;
-  const progress = Math.min(100, (subtotal / freeShipTarget) * 100);
+  const { drawerOpen, setDrawerOpen, enriched, setQty, remove, subtotal, shipping, count } = useCart();
+  const { settings } = useSiteSettings();
 
   return (
     <Sheet open={drawerOpen} onOpenChange={setDrawerOpen}>
@@ -26,15 +25,8 @@ export function CartDrawer() {
           </div>
         ) : (
           <>
-            <div className="my-3 space-y-2 text-xs">
-              {subtotal >= freeShipTarget ? (
-                <p className="text-success">You've unlocked free shipping! 🎉</p>
-              ) : (
-                <p className="text-muted-foreground">
-                  Add <span className="text-foreground font-semibold">{formatPKR(freeShipTarget - subtotal)}</span> more for free shipping
-                </p>
-              )}
-              <Progress value={progress} className="h-1.5" />
+            <div className="my-3 text-xs text-muted-foreground">
+              Delivery charges <span className="text-foreground font-semibold">{formatPKR(Number(settings.shipping_fee || 0))}</span> · payable on delivery
             </div>
 
             <div className="flex-1 overflow-y-auto -mx-6 px-6 divide-y divide-border">
@@ -67,6 +59,10 @@ export function CartDrawer() {
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">Subtotal</span>
                 <span className="price font-bold">{formatPKR(subtotal)}</span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span className="text-muted-foreground">Delivery</span>
+                <span className="price">{formatPKR(shipping)}</span>
               </div>
               <Button asChild className="w-full bg-primary hover:bg-primary/90 text-primary-foreground" onClick={() => setDrawerOpen(false)}>
                 <Link to="/checkout">Checkout</Link>
