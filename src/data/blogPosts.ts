@@ -1,7 +1,19 @@
 import type { BlogPost } from "./types";
+import blogEarbuds from "@/assets/blog-earbuds.jpg";
+import blogRouter from "@/assets/blog-router.jpg";
+import blogKeyboards from "@/assets/blog-keyboards.jpg";
+import blogPowerbank from "@/assets/blog-powerbank.jpg";
+import blogMesh from "@/assets/blog-mesh.jpg";
+import blogGaming from "@/assets/blog-gaming.jpg";
 
-const img = (seed: string, w = 1200, h = 600) =>
-  `https://picsum.photos/seed/${seed}/${w}/${h}`;
+const covers: Record<string, string> = {
+  b1: blogEarbuds,
+  b2: blogRouter,
+  b3: blogKeyboards,
+  b4: blogPowerbank,
+  b5: blogMesh,
+  b6: blogGaming,
+};
 
 const longContent = (title: string) => `
 <h2>Why this matters</h2>
@@ -29,7 +41,7 @@ export const blogPosts: BlogPost[] = [
   ...b,
   excerpt: `Everything you need to know about ${b.title.toLowerCase()} — practical advice from our team.`,
   content: longContent(b.title),
-  coverImage: img(`blog-${b.id}`),
+  coverImage: covers[b.id] ?? blogGaming,
   metaTitle: `${b.title} | libani Blog`,
   metaDescription: `Read about ${b.title.toLowerCase()} on the libani blog — guides, reviews and news from Pakistan's premier tech accessories store.`,
 })) as BlogPost[];

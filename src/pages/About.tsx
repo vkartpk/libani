@@ -2,6 +2,7 @@ import { SEO } from "@/components/SEO";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { BrandStrip } from "@/components/home/BrandStrip";
 import { NewsletterBanner } from "@/components/home/NewsletterBanner";
+import aboutTeam from "@/assets/about-team.jpg";
 
 export default function About() {
   return (
@@ -19,7 +20,7 @@ export default function About() {
             <p className="mt-4 text-sm text-muted-foreground leading-relaxed">From our humble beginnings in 2018, libani quickly grew to become one of Pakistan's premier tech accessories e-commerce destinations. We started with a simple mission: bring authentic, well-priced tech gear to every doorstep in Pakistan, backed by responsive support that actually listens.</p>
             <p className="mt-3 text-sm text-muted-foreground leading-relaxed">Today we partner with 18+ top global brands and serve thousands of happy customers from Karachi to Gilgit.</p>
           </div>
-          <img src="https://picsum.photos/seed/about/800/600" alt="Our team" className="rounded-lg" />
+          <img src={aboutTeam} alt="libani team packing tech accessory orders in Lahore" width={1024} height={768} loading="lazy" className="rounded-lg" />
         </div>
         <div className="mt-12 grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
           {[["5+","Years Experience"],["10K+","Happy Customers"],["500+","Products"],["18+","Top Brands"]].map(([n, l]) => (
