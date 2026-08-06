@@ -108,6 +108,8 @@ const App = () => (
                         <Route path="/libani/categories" element={<AdminCategories />} />
                         <Route path="/libani/brands" element={<AdminBrands />} />
                         <Route path="/libani/customers" element={<AdminCustomers />} />
+                        <Route path="/libani/pages" element={<AdminPages />} />
+                        <Route path="/libani/banners" element={<AdminBanners />} />
                         <Route path="/libani/seo" element={<AdminSeo />} />
                         <Route path="/libani/finance" element={<AdminFinance />} />
                         <Route path="/libani/payments" element={<AdminPayments />} />
