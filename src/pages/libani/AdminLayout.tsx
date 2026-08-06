@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 import { Navigate, NavLink, useLocation } from "react-router-dom";
-import { LayoutDashboard, ShoppingBag, Package, Tags, Building2, Users, ArrowLeft, Sparkles, Wallet, CreditCard, ImageIcon, Settings as SettingsIcon } from "lucide-react";
+import { LayoutDashboard, ShoppingBag, Package, Tags, Building2, Users, ArrowLeft, Sparkles, Wallet, CreditCard, ImageIcon, Settings as SettingsIcon, FileText, GalleryHorizontal } from "lucide-react";
 import { useUserRole } from "@/hooks/useUserRole";
 import { useAuth } from "@/contexts/AuthContext";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -13,6 +13,8 @@ const items = [
   { to: "/libani/categories", label: "Categories", icon: Tags },
   { to: "/libani/brands", label: "Brands", icon: Building2 },
   { to: "/libani/customers", label: "Customers", icon: Users },
+  { to: "/libani/pages", label: "Pages", icon: FileText },
+  { to: "/libani/banners", label: "Banners", icon: GalleryHorizontal },
   { to: "/libani/finance", label: "Finance", icon: Wallet },
   { to: "/libani/payments", label: "Payments", icon: CreditCard },
   { to: "/libani/image-optimizer", label: "Image Optimizer", icon: ImageIcon },

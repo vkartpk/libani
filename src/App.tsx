@@ -49,6 +49,8 @@ const AdminCategories = lazy(() => import("./pages/libani/Categories"));
 const AdminBrands = lazy(() => import("./pages/libani/Brands"));
 const AdminCustomers = lazy(() => import("./pages/libani/Customers"));
 const AdminSeo = lazy(() => import("./pages/libani/Seo"));
+const AdminPages = lazy(() => import("./pages/libani/Pages"));
+const AdminBanners = lazy(() => import("./pages/libani/Banners"));
 const AdminFinance = lazy(() => import("./pages/libani/Finance"));
 const AdminPayments = lazy(() => import("./pages/libani/Payments"));
 const AdminImageOptimizer = lazy(() => import("./pages/libani/ImageOptimizer"));
@@ -106,6 +108,8 @@ const App = () => (
                         <Route path="/libani/categories" element={<AdminCategories />} />
                         <Route path="/libani/brands" element={<AdminBrands />} />
                         <Route path="/libani/customers" element={<AdminCustomers />} />
+                        <Route path="/libani/pages" element={<AdminPages />} />
+                        <Route path="/libani/banners" element={<AdminBanners />} />
                         <Route path="/libani/seo" element={<AdminSeo />} />
                         <Route path="/libani/finance" element={<AdminFinance />} />
                         <Route path="/libani/payments" element={<AdminPayments />} />

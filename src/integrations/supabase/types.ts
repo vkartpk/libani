@@ -59,6 +59,51 @@ export type Database = {
         }
         Relationships: []
       }
+      banners: {
+        Row: {
+          badge: string | null
+          created_at: string
+          cta_href: string | null
+          cta_label: string | null
+          id: string
+          image_url: string | null
+          is_active: boolean
+          placement: string
+          sort_order: number
+          subtitle: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          badge?: string | null
+          created_at?: string
+          cta_href?: string | null
+          cta_label?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean
+          placement?: string
+          sort_order?: number
+          subtitle?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          badge?: string | null
+          created_at?: string
+          cta_href?: string | null
+          cta_label?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean
+          placement?: string
+          sort_order?: number
+          subtitle?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       brands: {
         Row: {
           banner_url: string | null
@@ -382,6 +427,51 @@ export type Database = {
           total?: number
           updated_at?: string
           user_id?: string | null
+        }
+        Relationships: []
+      }
+      pages: {
+        Row: {
+          content: string
+          created_at: string
+          footer_label: string | null
+          id: string
+          is_published: boolean
+          meta_description: string | null
+          meta_title: string | null
+          show_in_footer: boolean
+          slug: string
+          sort_order: number
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          content?: string
+          created_at?: string
+          footer_label?: string | null
+          id?: string
+          is_published?: boolean
+          meta_description?: string | null
+          meta_title?: string | null
+          show_in_footer?: boolean
+          slug: string
+          sort_order?: number
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          footer_label?: string | null
+          id?: string
+          is_published?: boolean
+          meta_description?: string | null
+          meta_title?: string | null
+          show_in_footer?: boolean
+          slug?: string
+          sort_order?: number
+          title?: string
+          updated_at?: string
         }
         Relationships: []
       }
