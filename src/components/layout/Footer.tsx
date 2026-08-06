@@ -5,10 +5,30 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import libaniLogo from "@/assets/libani-logo.png";
 import { useSiteSettings } from "@/hooks/useSiteSettings";
+import { useCmsPages } from "@/hooks/useCms";
 import { formatPKR } from "@/lib/storage";
 
 export function Footer() {
   const { settings } = useSiteSettings();
+  const { pages } = useCmsPages();
+  const cmsLinks = pages
+    .filter((p) => p.is_published && p.show_in_footer)
+    .map((p) => ({ to: `/policies/${p.slug}`, label: p.footer_label || p.title }));
+  const staticLinks = [
+    { to: "/products", label: "All Products" },
+    { to: "/about", label: "About Us" },
+    { to: "/faq", label: "FAQ" },
+    { to: "/contact", label: "Contact Us" },
+    { to: "/track-order", label: "Track Order" },
+    { to: "/blog", label: "Blog" },
+  ];
+  const fallbackLinks = [
+    { to: "/policies/refund", label: "Refund Policy" },
+    { to: "/policies/privacy", label: "Privacy Policy" },
+    { to: "/policies/terms", label: "Terms of Service" },
+    { to: "/policies/shipping", label: "Shipping Policy" },
+  ];
+  const quickLinks = [...staticLinks, ...(cmsLinks.length ? cmsLinks : fallbackLinks)];
   const trust = [
     { icon: Truck, label: `Delivery charges ${formatPKR(Number(settings.shipping_fee || 0))}` },
     { icon: Clock, label: "24/7 Customer Support" },
