@@ -72,16 +72,9 @@ export function Footer() {
         <div>
           <h3 className="font-display font-bold text-base mb-4">Quick Links</h3>
           <ul className="grid grid-cols-2 gap-2 text-sm text-muted-foreground">
-            <li><Link to="/products" className="hover:text-primary">All Products</Link></li>
-            <li><Link to="/about" className="hover:text-primary">About Us</Link></li>
-            <li><Link to="/faq" className="hover:text-primary">FAQ</Link></li>
-            <li><Link to="/policies/refund" className="hover:text-primary">Refund Policy</Link></li>
-            <li><Link to="/policies/privacy" className="hover:text-primary">Privacy Policy</Link></li>
-            <li><Link to="/policies/terms" className="hover:text-primary">Terms of Service</Link></li>
-            <li><Link to="/policies/shipping" className="hover:text-primary">Shipping Policy</Link></li>
-            <li><Link to="/contact" className="hover:text-primary">Contact Us</Link></li>
-            <li><Link to="/track-order" className="hover:text-primary">Track Order</Link></li>
-            <li><Link to="/blog" className="hover:text-primary">Blog</Link></li>
+            {quickLinks.map((l) => (
+              <li key={l.to}><Link to={l.to} className="hover:text-primary">{l.label}</Link></li>
+            ))}
           </ul>
         </div>
 
