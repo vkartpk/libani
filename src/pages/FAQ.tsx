@@ -1,8 +1,11 @@
 import { SEO } from "@/components/SEO";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
+import { useCmsPage, parseFaq } from "@/hooks/useCms";
+import { useSiteSettings } from "@/hooks/useSiteSettings";
+import { formatPKR } from "@/lib/storage";
 
-const groups = [
+const fallbackGroups = [
   { title: "Orders & Shipping", items: [
     ["How long does delivery take?", "We deliver within 2-3 working days across Pakistan."],
     ["Do you charge for delivery?", "Yes — delivery charges apply on every order and are payable when we deliver."],
@@ -27,16 +30,25 @@ const groups = [
 ];
 
 export default function FAQ() {
+  const { page } = useCmsPage("faq");
+  const { settings } = useSiteSettings();
+  const resolved = (page?.content || "")
+    .replace(/%shipping_fee%/g, formatPKR(Number(settings.shipping_fee || 0)))
+    .replace(/%delivery_days%/g, `${settings.delivery_days_min}-${settings.delivery_days_max}`)
+    .replace(/%site_name%/g, settings.site_name);
+  const parsed = parseFaq(resolved);
+  const groups = parsed.length ? parsed : (fallbackGroups as { title: string; items: [string, string][] }[]);
+  const title = page?.title || "Frequently Asked Questions";
   const ld = {
     "@context": "https://schema.org", "@type": "FAQPage",
     mainEntity: groups.flatMap((g) => g.items.map(([q, a]) => ({ "@type": "Question", name: q, acceptedAnswer: { "@type": "Answer", text: a } }))),
   };
   return (
     <>
-      <SEO title="FAQ | libani" jsonLd={ld} />
+      <SEO title={page?.meta_title || "FAQ | libani"} description={page?.meta_description || undefined} jsonLd={ld} />
       <div className="container-x py-6 max-w-3xl">
         <Breadcrumbs items={[{ label: "Home", to: "/" }, { label: "FAQ" }]} />
-        <h1 className="font-display text-2xl md:text-3xl font-bold mt-4">Frequently Asked Questions</h1>
+        <h1 className="font-display text-2xl md:text-3xl font-bold mt-4">{title}</h1>
         <div className="mt-6 space-y-8">
           {groups.map((g) => (
             <div key={g.title}>
