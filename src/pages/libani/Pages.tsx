@@ -118,14 +118,24 @@ function SystemPages({ list, onEdit }: { list: any[]; onEdit: (p: any) => void }
 function PageDialog({ editing, onClose, onSaved }: { editing: any; onClose: () => void; onSaved: () => void }) {
   const [form, setForm] = useState<any>({});
   const [saving, setSaving] = useState(false);
-  useEffect(() => { setForm(editing || {}); }, [editing]);
+  useEffect(() => {
+    if (!editing) return setForm({});
+    const s = editing.sections || {};
+    setForm({
+      ...editing,
+      _subtitle: s.subtitle || "",
+      _hours: s.hours || "",
+      _stats: (s.stats || []).map((r: any) => `${r[0]} | ${r[1]}`).join("\n"),
+    });
+  }, [editing]);
   if (!editing) return null;
+  const isSystem = editing.kind === "system";
   const set = (k: string, v: any) => setForm((f: any) => ({ ...f, [k]: v }));
 
   const save = async () => {
     if (!form.slug || !form.title) return toast.error("Title and URL slug are required");
     setSaving(true);
-    const payload = {
+    const payload: any = {
       slug: String(form.slug).trim().toLowerCase().replace(/[^a-z0-9-]+/g, "-"),
       title: form.title,
       content: form.content || "",
@@ -136,6 +146,19 @@ function PageDialog({ editing, onClose, onSaved }: { editing: any; onClose: () =
       is_published: !!form.is_published,
       sort_order: Number(form.sort_order || 0),
     };
+    if (isSystem) {
+      const stats = String(form._stats || "")
+        .split("\n")
+        .map((l) => l.split("|").map((x) => x.trim()))
+        .filter((r) => r[0] && r[1])
+        .map((r) => [r[0], r[1]]);
+      payload.sections = {
+        ...(editing.sections || {}),
+        ...(form._subtitle ? { subtitle: form._subtitle } : {}),
+        ...(form._hours ? { hours: form._hours } : {}),
+        ...(stats.length ? { stats } : {}),
+      };
+    }
     const { error } = form.id
       ? await db.from("pages").update(payload).eq("id", form.id)
       : await db.from("pages").insert(payload);
@@ -152,12 +175,30 @@ function PageDialog({ editing, onClose, onSaved }: { editing: any; onClose: () =
         <div className="grid gap-4">
           <div className="grid md:grid-cols-2 gap-3">
             <div><Label>Title</Label><Input value={form.title || ""} onChange={(e) => set("title", e.target.value)} /></div>
-            <div><Label>URL slug</Label><Input value={form.slug || ""} onChange={(e) => set("slug", e.target.value)} placeholder="privacy" /></div>
+            <div>
+              <Label>URL {isSystem ? "(fixed)" : "slug"}</Label>
+              <Input value={isSystem ? form.route || `/${form.slug}` : form.slug || ""} disabled={isSystem} onChange={(e) => set("slug", e.target.value)} placeholder="privacy" />
+            </div>
           </div>
+          {isSystem && form.slug === "about" && (
+            <div><Label>Hero subtitle</Label><Textarea rows={2} value={form._subtitle || ""} onChange={(e) => set("_subtitle", e.target.value)} /></div>
+          )}
           <div>
-            <Label>Content</Label>
-            <Textarea rows={10} value={form.content || ""} onChange={(e) => set("content", e.target.value)} placeholder="Page text… line breaks are preserved." />
+            <Label>{isSystem && form.slug === "faq" ? "Questions & answers" : isSystem && form.slug === "contact" ? "Intro text" : "Content"}</Label>
+            <Textarea rows={isSystem && form.slug === "contact" ? 3 : 12} value={form.content || ""} onChange={(e) => set("content", e.target.value)} placeholder="Page text… line breaks are preserved." />
+            {isSystem && form.slug === "faq" && (
+              <p className="mt-1 text-xs text-muted-foreground">Format: <code>## Group name</code> on its own line, then <code>Q: question</code> and <code>A: answer</code> lines.</p>
+            )}
           </div>
+          {isSystem && form.slug === "about" && (
+            <div>
+              <Label>Stats (one per line: value | label)</Label>
+              <Textarea rows={4} value={form._stats || ""} onChange={(e) => set("_stats", e.target.value)} placeholder="10K+ | Happy Customers" />
+            </div>
+          )}
+          {isSystem && form.slug === "contact" && (
+            <div><Label>Support hours</Label><Input value={form._hours || ""} onChange={(e) => set("_hours", e.target.value)} /></div>
+          )}
           <div className="grid md:grid-cols-2 gap-3">
             <div><Label>Footer link label</Label><Input value={form.footer_label || ""} onChange={(e) => set("footer_label", e.target.value)} placeholder="Same as title" /></div>
             <div><Label>Sort order</Label><Input type="number" value={form.sort_order ?? 0} onChange={(e) => set("sort_order", e.target.value)} /></div>
