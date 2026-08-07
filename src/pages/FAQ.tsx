@@ -1,6 +1,7 @@
 import { SEO } from "@/components/SEO";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
+import { usePageSeo } from "@/hooks/useCms";
 
 const groups = [
   { title: "Orders & Shipping", items: [
