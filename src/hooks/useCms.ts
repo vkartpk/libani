@@ -12,6 +12,9 @@ export type CmsPage = {
   show_in_footer: boolean;
   sort_order: number;
   is_published: boolean;
+  kind?: string | null;
+  route?: string | null;
+  sections?: Record<string, any> | null;
 };
 
 export type CmsBanner = {
@@ -46,6 +49,27 @@ export function useCmsPage(slug?: string) {
   const { pages, isLoading } = useCmsPages();
   const page = pages.find((p) => p.slug === slug) || null;
   return { page, pages, isLoading };
+}
+
+/** Parses the FAQ text format: "## Group" then alternating "Q:" / "A:" lines. */
+export function parseFaq(content: string) {
+  const groups: { title: string; items: [string, string][] }[] = [];
+  let current: { title: string; items: [string, string][] } | null = null;
+  let pendingQ: string | null = null;
+  for (const line of (content || "").split("\n").map((l) => l.trim())) {
+    if (!line) continue;
+    if (line.startsWith("##")) {
+      current = { title: line.replace(/^#+\s*/, ""), items: [] };
+      groups.push(current);
+    } else if (/^q:/i.test(line)) {
+      pendingQ = line.slice(2).trim();
+    } else if (/^a:/i.test(line) && pendingQ) {
+      if (!current) { current = { title: "General", items: [] }; groups.push(current); }
+      current.items.push([pendingQ, line.slice(2).trim()]);
+      pendingQ = null;
+    }
+  }
+  return groups.filter((g) => g.items.length);
 }
 
 export function useBanners(placement = "hero") {
