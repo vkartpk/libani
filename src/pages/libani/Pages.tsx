@@ -24,6 +24,9 @@ export default function AdminPages() {
   };
   useEffect(() => { load(); }, []);
 
+  const system = list.filter((p) => p.is_system || p.link_url);
+  const custom = list.filter((p) => !(p.is_system || p.link_url));
+
   const remove = async (id: string) => {
     if (!confirm("Delete this page?")) return;
     const { error } = await db.from("pages").delete().eq("id", id);
@@ -33,9 +36,51 @@ export default function AdminPages() {
 
   return (
     <AdminLayout title="Pages">
+      <Card className="p-4 mb-4">
+        <div className="mb-3">
+          <div className="font-semibold">Built-in pages</div>
+          <div className="text-sm text-muted-foreground">
+            These pages already exist on the storefront (About, FAQ, Contact, etc.). You can edit their footer label, order, visibility and SEO — their layout stays as-is.
+          </div>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead className="text-left text-muted-foreground">
+              <tr><th className="py-2">Page</th><th>URL</th><th>Footer</th><th>Order</th><th></th></tr>
+            </thead>
+            <tbody>
+              {system.map((p) => (
+                <tr key={p.id} className="border-t">
+                  <td className="py-2 font-medium">{p.title}</td>
+                  <td className="font-mono text-xs">
+                    <a href={p.link_url || `/policies/${p.slug}`} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 hover:text-primary">
+                      {p.link_url || `/policies/${p.slug}`} <ExternalLink className="h-3 w-3" />
+                    </a>
+                  </td>
+                  <td>{p.show_in_footer ? "Yes" : "No"}</td>
+                  <td>{p.sort_order}</td>
+                  <td>
+                    <div className="flex justify-end">
+                      <Button size="sm" variant="outline" onClick={() => setEditing(p)}>
+                        <Pencil className="h-4 w-4 mr-1" /> Edit
+                      </Button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+              {!system.length && (
+                <tr><td colSpan={5} className="py-6 text-center text-muted-foreground">
+                  Built-in pages not synced yet — run <code>CMS_SYSTEM_PAGES.sql</code> in your database SQL editor.
+                </td></tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </Card>
+
       <Card className="p-4">
         <div className="flex items-center justify-between mb-3">
-          <div className="text-sm text-muted-foreground">{list.length} pages · footer links update automatically</div>
+          <div className="text-sm text-muted-foreground">{custom.length} content pages · footer links update automatically</div>
           <Button onClick={() => setEditing({ show_in_footer: true, is_published: true, sort_order: (list.length + 1) * 10 })}>
             <Plus className="h-4 w-4 mr-1" /> New page
           </Button>
@@ -46,7 +91,7 @@ export default function AdminPages() {
               <tr><th className="py-2">Title</th><th>URL</th><th>Footer</th><th>Published</th><th>Order</th><th></th></tr>
             </thead>
             <tbody>
-              {list.map((p) => (
+              {custom.map((p) => (
                 <tr key={p.id} className="border-t">
                   <td className="py-2 font-medium">{p.title}</td>
                   <td className="font-mono text-xs">
@@ -65,7 +110,7 @@ export default function AdminPages() {
                   </td>
                 </tr>
               ))}
-              {!list.length && <tr><td colSpan={6} className="py-8 text-center text-muted-foreground">No pages yet</td></tr>}
+              {!custom.length && <tr><td colSpan={6} className="py-8 text-center text-muted-foreground">No pages yet</td></tr>}
             </tbody>
           </table>
         </div>
