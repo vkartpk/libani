@@ -129,11 +129,21 @@ function PageDialog({ editing, onClose, onSaved }: { editing: any; onClose: () =
   useEffect(() => { setForm(editing || {}); }, [editing]);
   if (!editing) return null;
   const set = (k: string, v: any) => setForm((f: any) => ({ ...f, [k]: v }));
+  const isSystem = !!(editing.is_system || editing.link_url);
 
   const save = async () => {
     if (!form.slug || !form.title) return toast.error("Title and URL slug are required");
     setSaving(true);
-    const payload = {
+    const payload: any = isSystem
+      ? {
+          title: form.title,
+          meta_title: form.meta_title || null,
+          meta_description: form.meta_description || null,
+          footer_label: form.footer_label || null,
+          show_in_footer: !!form.show_in_footer,
+          sort_order: Number(form.sort_order || 0),
+        }
+      : {
       slug: String(form.slug).trim().toLowerCase().replace(/[^a-z0-9-]+/g, "-"),
       title: form.title,
       content: form.content || "",
@@ -156,16 +166,31 @@ function PageDialog({ editing, onClose, onSaved }: { editing: any; onClose: () =
   return (
     <Dialog open onOpenChange={(o) => !o && onClose()}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader><DialogTitle>{form.id ? "Edit page" : "New page"}</DialogTitle></DialogHeader>
+        <DialogHeader><DialogTitle>{isSystem ? `Edit built-in page — ${editing.title}` : form.id ? "Edit page" : "New page"}</DialogTitle></DialogHeader>
         <div className="grid gap-4">
+          {isSystem && (
+            <p className="text-xs text-muted-foreground">
+              This page's layout lives in the storefront. Here you control its footer link and SEO meta tags.
+            </p>
+          )}
           <div className="grid md:grid-cols-2 gap-3">
             <div><Label>Title</Label><Input value={form.title || ""} onChange={(e) => set("title", e.target.value)} /></div>
-            <div><Label>URL slug</Label><Input value={form.slug || ""} onChange={(e) => set("slug", e.target.value)} placeholder="privacy" /></div>
+            <div>
+              <Label>{isSystem ? "URL" : "URL slug"}</Label>
+              <Input
+                value={isSystem ? editing.link_url || `/policies/${editing.slug}` : form.slug || ""}
+                onChange={(e) => set("slug", e.target.value)}
+                placeholder="privacy"
+                disabled={isSystem}
+              />
+            </div>
           </div>
+          {!isSystem && (
           <div>
             <Label>Content</Label>
             <Textarea rows={10} value={form.content || ""} onChange={(e) => set("content", e.target.value)} placeholder="Page text… line breaks are preserved." />
           </div>
+          )}
           <div className="grid md:grid-cols-2 gap-3">
             <div><Label>Footer link label</Label><Input value={form.footer_label || ""} onChange={(e) => set("footer_label", e.target.value)} placeholder="Same as title" /></div>
             <div><Label>Sort order</Label><Input type="number" value={form.sort_order ?? 0} onChange={(e) => set("sort_order", e.target.value)} /></div>
@@ -174,7 +199,9 @@ function PageDialog({ editing, onClose, onSaved }: { editing: any; onClose: () =
           <div><Label>SEO description</Label><Textarea rows={2} value={form.meta_description || ""} onChange={(e) => set("meta_description", e.target.value)} /></div>
           <div className="flex items-center gap-6">
             <label className="flex items-center gap-2 text-sm"><Switch checked={!!form.show_in_footer} onCheckedChange={(v) => set("show_in_footer", v)} /> Show in footer</label>
-            <label className="flex items-center gap-2 text-sm"><Switch checked={!!form.is_published} onCheckedChange={(v) => set("is_published", v)} /> Published</label>
+            {!isSystem && (
+              <label className="flex items-center gap-2 text-sm"><Switch checked={!!form.is_published} onCheckedChange={(v) => set("is_published", v)} /> Published</label>
+            )}
           </div>
         </div>
         <DialogFooter>
