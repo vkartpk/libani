@@ -1,7 +1,6 @@
 import { SEO } from "@/components/SEO";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
-import { usePageSeo } from "@/hooks/useCms";
 
 const groups = [
   { title: "Orders & Shipping", items: [
@@ -28,14 +27,13 @@ const groups = [
 ];
 
 export default function FAQ() {
-  const seo = usePageSeo("faq", { title: "FAQ | libani", description: "Answers about delivery, payments, warranty and returns at libani." });
   const ld = {
     "@context": "https://schema.org", "@type": "FAQPage",
     mainEntity: groups.flatMap((g) => g.items.map(([q, a]) => ({ "@type": "Question", name: q, acceptedAnswer: { "@type": "Answer", text: a } }))),
   };
   return (
     <>
-      <SEO title={seo.title} description={seo.description} jsonLd={ld} />
+      <SEO title="FAQ | libani" jsonLd={ld} />
       <div className="container-x py-6 max-w-3xl">
         <Breadcrumbs items={[{ label: "Home", to: "/" }, { label: "FAQ" }]} />
         <h1 className="font-display text-2xl md:text-3xl font-bold mt-4">Frequently Asked Questions</h1>

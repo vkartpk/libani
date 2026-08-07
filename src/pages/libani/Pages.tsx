@@ -24,9 +24,6 @@ export default function AdminPages() {
   };
   useEffect(() => { load(); }, []);
 
-  const system = list.filter((p) => p.is_system || p.link_url);
-  const custom = list.filter((p) => !(p.is_system || p.link_url));
-
   const remove = async (id: string) => {
     if (!confirm("Delete this page?")) return;
     const { error } = await db.from("pages").delete().eq("id", id);
@@ -36,51 +33,9 @@ export default function AdminPages() {
 
   return (
     <AdminLayout title="Pages">
-      <Card className="p-4 mb-4">
-        <div className="mb-3">
-          <div className="font-semibold">Built-in pages</div>
-          <div className="text-sm text-muted-foreground">
-            These pages already exist on the storefront (About, FAQ, Contact, etc.). You can edit their footer label, order, visibility and SEO — their layout stays as-is.
-          </div>
-        </div>
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead className="text-left text-muted-foreground">
-              <tr><th className="py-2">Page</th><th>URL</th><th>Footer</th><th>Order</th><th></th></tr>
-            </thead>
-            <tbody>
-              {system.map((p) => (
-                <tr key={p.id} className="border-t">
-                  <td className="py-2 font-medium">{p.title}</td>
-                  <td className="font-mono text-xs">
-                    <a href={p.link_url || `/policies/${p.slug}`} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 hover:text-primary">
-                      {p.link_url || `/policies/${p.slug}`} <ExternalLink className="h-3 w-3" />
-                    </a>
-                  </td>
-                  <td>{p.show_in_footer ? "Yes" : "No"}</td>
-                  <td>{p.sort_order}</td>
-                  <td>
-                    <div className="flex justify-end">
-                      <Button size="sm" variant="outline" onClick={() => setEditing(p)}>
-                        <Pencil className="h-4 w-4 mr-1" /> Edit
-                      </Button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-              {!system.length && (
-                <tr><td colSpan={5} className="py-6 text-center text-muted-foreground">
-                  Built-in pages not synced yet — run <code>CMS_SYSTEM_PAGES.sql</code> in your database SQL editor.
-                </td></tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-      </Card>
-
       <Card className="p-4">
         <div className="flex items-center justify-between mb-3">
-          <div className="text-sm text-muted-foreground">{custom.length} content pages · footer links update automatically</div>
+          <div className="text-sm text-muted-foreground">{list.length} pages · footer links update automatically</div>
           <Button onClick={() => setEditing({ show_in_footer: true, is_published: true, sort_order: (list.length + 1) * 10 })}>
             <Plus className="h-4 w-4 mr-1" /> New page
           </Button>
@@ -91,7 +46,7 @@ export default function AdminPages() {
               <tr><th className="py-2">Title</th><th>URL</th><th>Footer</th><th>Published</th><th>Order</th><th></th></tr>
             </thead>
             <tbody>
-              {custom.map((p) => (
+              {list.map((p) => (
                 <tr key={p.id} className="border-t">
                   <td className="py-2 font-medium">{p.title}</td>
                   <td className="font-mono text-xs">
@@ -110,7 +65,7 @@ export default function AdminPages() {
                   </td>
                 </tr>
               ))}
-              {!custom.length && <tr><td colSpan={6} className="py-8 text-center text-muted-foreground">No pages yet</td></tr>}
+              {!list.length && <tr><td colSpan={6} className="py-8 text-center text-muted-foreground">No pages yet</td></tr>}
             </tbody>
           </table>
         </div>
@@ -129,21 +84,11 @@ function PageDialog({ editing, onClose, onSaved }: { editing: any; onClose: () =
   useEffect(() => { setForm(editing || {}); }, [editing]);
   if (!editing) return null;
   const set = (k: string, v: any) => setForm((f: any) => ({ ...f, [k]: v }));
-  const isSystem = !!(editing.is_system || editing.link_url);
 
   const save = async () => {
     if (!form.slug || !form.title) return toast.error("Title and URL slug are required");
     setSaving(true);
-    const payload: any = isSystem
-      ? {
-          title: form.title,
-          meta_title: form.meta_title || null,
-          meta_description: form.meta_description || null,
-          footer_label: form.footer_label || null,
-          show_in_footer: !!form.show_in_footer,
-          sort_order: Number(form.sort_order || 0),
-        }
-      : {
+    const payload = {
       slug: String(form.slug).trim().toLowerCase().replace(/[^a-z0-9-]+/g, "-"),
       title: form.title,
       content: form.content || "",
@@ -166,31 +111,16 @@ function PageDialog({ editing, onClose, onSaved }: { editing: any; onClose: () =
   return (
     <Dialog open onOpenChange={(o) => !o && onClose()}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader><DialogTitle>{isSystem ? `Edit built-in page — ${editing.title}` : form.id ? "Edit page" : "New page"}</DialogTitle></DialogHeader>
+        <DialogHeader><DialogTitle>{form.id ? "Edit page" : "New page"}</DialogTitle></DialogHeader>
         <div className="grid gap-4">
-          {isSystem && (
-            <p className="text-xs text-muted-foreground">
-              This page's layout lives in the storefront. Here you control its footer link and SEO meta tags.
-            </p>
-          )}
           <div className="grid md:grid-cols-2 gap-3">
             <div><Label>Title</Label><Input value={form.title || ""} onChange={(e) => set("title", e.target.value)} /></div>
-            <div>
-              <Label>{isSystem ? "URL" : "URL slug"}</Label>
-              <Input
-                value={isSystem ? editing.link_url || `/policies/${editing.slug}` : form.slug || ""}
-                onChange={(e) => set("slug", e.target.value)}
-                placeholder="privacy"
-                disabled={isSystem}
-              />
-            </div>
+            <div><Label>URL slug</Label><Input value={form.slug || ""} onChange={(e) => set("slug", e.target.value)} placeholder="privacy" /></div>
           </div>
-          {!isSystem && (
           <div>
             <Label>Content</Label>
             <Textarea rows={10} value={form.content || ""} onChange={(e) => set("content", e.target.value)} placeholder="Page text… line breaks are preserved." />
           </div>
-          )}
           <div className="grid md:grid-cols-2 gap-3">
             <div><Label>Footer link label</Label><Input value={form.footer_label || ""} onChange={(e) => set("footer_label", e.target.value)} placeholder="Same as title" /></div>
             <div><Label>Sort order</Label><Input type="number" value={form.sort_order ?? 0} onChange={(e) => set("sort_order", e.target.value)} /></div>
@@ -199,9 +129,7 @@ function PageDialog({ editing, onClose, onSaved }: { editing: any; onClose: () =
           <div><Label>SEO description</Label><Textarea rows={2} value={form.meta_description || ""} onChange={(e) => set("meta_description", e.target.value)} /></div>
           <div className="flex items-center gap-6">
             <label className="flex items-center gap-2 text-sm"><Switch checked={!!form.show_in_footer} onCheckedChange={(v) => set("show_in_footer", v)} /> Show in footer</label>
-            {!isSystem && (
-              <label className="flex items-center gap-2 text-sm"><Switch checked={!!form.is_published} onCheckedChange={(v) => set("is_published", v)} /> Published</label>
-            )}
+            <label className="flex items-center gap-2 text-sm"><Switch checked={!!form.is_published} onCheckedChange={(v) => set("is_published", v)} /> Published</label>
           </div>
         </div>
         <DialogFooter>

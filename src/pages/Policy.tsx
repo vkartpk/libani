@@ -19,7 +19,7 @@ export default function Policy() {
   const { page, pages, isLoading } = useCmsPage(slug);
   const { settings } = useSiteSettings();
 
-  const published = pages.filter((p) => p.is_published && !p.is_system && !p.link_url);
+  const published = pages.filter((p) => p.is_published);
   const nav = published.length
     ? published.map((p) => [p.slug, p.footer_label || p.title] as const)
     : Object.entries(fallback).map(([s, p]) => [s, p.title] as const);

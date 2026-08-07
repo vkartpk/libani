@@ -4,16 +4,14 @@ import { SEO } from "@/components/SEO";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { blogPosts } from "@/data/blogPosts";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { usePageSeo } from "@/hooks/useCms";
 
 export default function Blog() {
-  const seo = usePageSeo("blog", { title: "Blog | libani", description: "Reviews, guides, news and tips from the libani team." });
   const [cat, setCat] = useState("All");
   const cats = ["All","Reviews","Guides","News","Tips"];
   const items = cat === "All" ? blogPosts : blogPosts.filter((p) => p.category === cat);
   return (
     <>
-      <SEO title={seo.title} description={seo.description} />
+      <SEO title="Blog | libani" description="Reviews, guides, news and tips from the libani team." />
       <div className="container-x py-6">
         <Breadcrumbs items={[{ label: "Home", to: "/" }, { label: "Blog" }]} />
         <h1 className="font-display text-2xl md:text-3xl font-bold mt-4">From the Blog</h1>

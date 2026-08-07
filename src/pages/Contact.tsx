@@ -11,7 +11,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { toast } from "sonner";
 import { Phone, Mail, MapPin } from "lucide-react";
 import { useState } from "react";
-import { usePageSeo } from "@/hooks/useCms";
 
 const schema = z.object({
   name: z.string().trim().min(2).max(100),
@@ -23,12 +22,11 @@ const schema = z.object({
 type Form = z.infer<typeof schema>;
 
 export default function Contact() {
-  const seo = usePageSeo("contact", { title: "Contact Us | libani", description: "Contact the libani team by phone, email or WhatsApp." });
   const [sent, setSent] = useState(false);
   const { register, handleSubmit, setValue, formState: { errors } } = useForm<Form>({ resolver: zodResolver(schema) });
   return (
     <>
-      <SEO title={seo.title} description={seo.description} />
+      <SEO title="Contact | libani" />
       <div className="container-x py-6">
         <Breadcrumbs items={[{ label: "Home", to: "/" }, { label: "Contact" }]} />
         <h1 className="font-display text-2xl md:text-3xl font-bold mt-4">Get in Touch</h1>

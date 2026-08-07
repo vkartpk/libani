@@ -9,8 +9,6 @@ export type CmsPage = {
   meta_title: string | null;
   meta_description: string | null;
   footer_label: string | null;
-  link_url?: string | null;
-  is_system?: boolean;
   show_in_footer: boolean;
   sort_order: number;
   is_published: boolean;
@@ -48,15 +46,6 @@ export function useCmsPage(slug?: string) {
   const { pages, isLoading } = useCmsPages();
   const page = pages.find((p) => p.slug === slug) || null;
   return { page, pages, isLoading };
-}
-
-/** SEO overrides for built-in (system) pages, managed from /libani/pages */
-export function usePageSeo(slug: string, fallback: { title: string; description?: string }) {
-  const { page } = useCmsPage(slug);
-  return {
-    title: page?.meta_title || fallback.title,
-    description: page?.meta_description || fallback.description,
-  };
 }
 
 export function useBanners(placement = "hero") {

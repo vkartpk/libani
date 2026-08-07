@@ -13,7 +13,7 @@ export function Footer() {
   const { pages } = useCmsPages();
   const cmsLinks = pages
     .filter((p) => p.is_published && p.show_in_footer)
-    .map((p) => ({ to: p.link_url || `/policies/${p.slug}`, label: p.footer_label || p.title }));
+    .map((p) => ({ to: `/policies/${p.slug}`, label: p.footer_label || p.title }));
   const staticLinks = [
     { to: "/products", label: "All Products" },
     { to: "/about", label: "About Us" },
@@ -28,13 +28,7 @@ export function Footer() {
     { to: "/policies/terms", label: "Terms of Service" },
     { to: "/policies/shipping", label: "Shipping Policy" },
   ];
-  const quickLinks = cmsLinks.length
-    ? [
-        // keep built-in links that the CMS does not manage yet
-        ...staticLinks.filter((s) => !cmsLinks.some((c) => c.to === s.to)),
-        ...cmsLinks,
-      ]
-    : [...staticLinks, ...fallbackLinks];
+  const quickLinks = [...staticLinks, ...(cmsLinks.length ? cmsLinks : fallbackLinks)];
   const trust = [
     { icon: Truck, label: `Delivery charges ${formatPKR(Number(settings.shipping_fee || 0))}` },
     { icon: Clock, label: "24/7 Customer Support" },
