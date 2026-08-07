@@ -8,8 +8,10 @@ import { Package, Check, Truck, Home } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { formatPKR } from "@/lib/storage";
 import { toast } from "sonner";
+import { usePageSeo } from "@/hooks/useCms";
 
 export default function TrackOrder() {
+  const seo = usePageSeo("track-order", { title: "Track Order | libani", description: "Track your libani order with your order number." });
   const [order, setOrder] = useState<any | null>(null);
   const [num, setNum] = useState("");
   const [contact, setContact] = useState("");
@@ -35,7 +37,7 @@ export default function TrackOrder() {
 
   return (
     <>
-      <SEO title="Track Order | libani" />
+      <SEO title={seo.title} description={seo.description} />
       <div className="container-x py-6 max-w-2xl">
         <Breadcrumbs items={[{ label: "Home", to: "/" }, { label: "Track Order" }]} />
         <div className="mt-6 bg-card border border-border rounded-lg p-6 md:p-8">

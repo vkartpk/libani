@@ -3,11 +3,13 @@ import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { BrandStrip } from "@/components/home/BrandStrip";
 import { NewsletterBanner } from "@/components/home/NewsletterBanner";
 import aboutTeam from "@/assets/about-team.jpg";
+import { usePageSeo } from "@/hooks/useCms";
 
 export default function About() {
+  const seo = usePageSeo("about", { title: "About Us | libani", description: "Learn the story behind libani — Pakistan's premier tech accessories destination." });
   return (
     <>
-      <SEO title="About Us | libani" description="Learn the story behind libani — Pakistan's premier tech accessories destination." />
+      <SEO title={seo.title} description={seo.description} />
       <div className="container-x py-6">
         <Breadcrumbs items={[{ label: "Home", to: "/" }, { label: "About" }]} />
         <div className="mt-6 rounded-xl bg-gradient-to-br from-primary/20 to-card border border-border p-8 md:p-14">
