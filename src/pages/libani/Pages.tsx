@@ -16,6 +16,7 @@ const db = supabase as any;
 export default function AdminPages() {
   const [list, setList] = useState<any[]>([]);
   const [editing, setEditing] = useState<any>(null);
+  const [tab, setTab] = useState<"policy" | "system">("policy");
 
   const load = async () => {
     const { data, error } = await db.from("pages").select("*").order("sort_order");
@@ -33,9 +34,16 @@ export default function AdminPages() {
 
   return (
     <AdminLayout title="Pages">
+      <div className="mb-4 flex gap-2">
+        <Button size="sm" variant={tab === "policy" ? "default" : "outline"} onClick={() => setTab("policy")}>Policy pages</Button>
+        <Button size="sm" variant={tab === "system" ? "default" : "outline"} onClick={() => setTab("system")}>Existing site pages</Button>
+      </div>
+      {tab === "system" ? (
+        <SystemPages list={list.filter((p) => p.kind === "system")} onEdit={setEditing} />
+      ) : (
       <Card className="p-4">
         <div className="flex items-center justify-between mb-3">
-          <div className="text-sm text-muted-foreground">{list.length} pages · footer links update automatically</div>
+          <div className="text-sm text-muted-foreground">{list.filter((p) => p.kind !== "system").length} pages · footer links update automatically</div>
           <Button onClick={() => setEditing({ show_in_footer: true, is_published: true, sort_order: (list.length + 1) * 10 })}>
             <Plus className="h-4 w-4 mr-1" /> New page
           </Button>
@@ -46,7 +54,7 @@ export default function AdminPages() {
               <tr><th className="py-2">Title</th><th>URL</th><th>Footer</th><th>Published</th><th>Order</th><th></th></tr>
             </thead>
             <tbody>
-              {list.map((p) => (
+              {list.filter((p) => p.kind !== "system").map((p) => (
                 <tr key={p.id} className="border-t">
                   <td className="py-2 font-medium">{p.title}</td>
                   <td className="font-mono text-xs">
@@ -65,7 +73,7 @@ export default function AdminPages() {
                   </td>
                 </tr>
               ))}
-              {!list.length && <tr><td colSpan={6} className="py-8 text-center text-muted-foreground">No pages yet</td></tr>}
+              {!list.filter((p) => p.kind !== "system").length && <tr><td colSpan={6} className="py-8 text-center text-muted-foreground">No pages yet</td></tr>}
             </tbody>
           </table>
         </div>
@@ -73,8 +81,37 @@ export default function AdminPages() {
           Tip: inside content you can use <code>%shipping_fee%</code>, <code>%delivery_days%</code> and <code>%site_name%</code> — they are replaced with live settings values.
         </p>
       </Card>
+      )}
       <PageDialog editing={editing} onClose={() => setEditing(null)} onSaved={() => { load(); setEditing(null); }} />
     </AdminLayout>
+  );
+}
+
+function SystemPages({ list, onEdit }: { list: any[]; onEdit: (p: any) => void }) {
+  return (
+    <Card className="p-4">
+      <div className="text-sm text-muted-foreground mb-3">
+        These are the pages that already exist on your website (About, FAQ, Contact). You can edit their text, SEO and extras — the URL and layout stay fixed.
+      </div>
+      <div className="grid gap-3">
+        {list.map((p) => (
+          <div key={p.id} className="flex items-center justify-between rounded-lg border p-3">
+            <div>
+              <div className="font-medium">{p.title}</div>
+              <a href={p.route || `/${p.slug}`} target="_blank" rel="noreferrer" className="text-xs font-mono text-muted-foreground inline-flex items-center gap-1 hover:text-primary">
+                {p.route || `/${p.slug}`} <ExternalLink className="h-3 w-3" />
+              </a>
+            </div>
+            <Button size="sm" variant="outline" onClick={() => onEdit(p)}><Pencil className="h-4 w-4 mr-1" /> Edit</Button>
+          </div>
+        ))}
+        {!list.length && (
+          <p className="py-8 text-center text-sm text-muted-foreground">
+            Not set up yet — run <code>CMS_PAGES_V2.sql</code> in your database SQL editor to make About, FAQ and Contact editable.
+          </p>
+        )}
+      </div>
+    </Card>
   );
 }
 
