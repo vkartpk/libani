@@ -437,8 +437,11 @@ export type Database = {
           footer_label: string | null
           id: string
           is_published: boolean
+          kind: string
           meta_description: string | null
           meta_title: string | null
+          route: string | null
+          sections: Json
           show_in_footer: boolean
           slug: string
           sort_order: number
@@ -451,8 +454,11 @@ export type Database = {
           footer_label?: string | null
           id?: string
           is_published?: boolean
+          kind?: string
           meta_description?: string | null
           meta_title?: string | null
+          route?: string | null
+          sections?: Json
           show_in_footer?: boolean
           slug: string
           sort_order?: number
@@ -465,8 +471,11 @@ export type Database = {
           footer_label?: string | null
           id?: string
           is_published?: boolean
+          kind?: string
           meta_description?: string | null
           meta_title?: string | null
+          route?: string | null
+          sections?: Json
           show_in_footer?: boolean
           slug?: string
           sort_order?: number
