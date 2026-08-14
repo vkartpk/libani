@@ -81,6 +81,7 @@ export default function Checkout() {
       product_slug: product.slug,
       product_name: product.name,
       product_image: product.images[0],
+      product_sku: product.sku ?? null,
       variant_label: item.variantId ?? null,
       unit_price: product.price,
       quantity: item.qty,
