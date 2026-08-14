@@ -6,7 +6,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { SEO } from "@/components/SEO";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { useCart } from "@/contexts/CartContext";
-import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/lib/supabase";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -36,7 +35,6 @@ export default function Checkout() {
   const [placing, setPlacing] = useState(false);
   const [shippingData, setShippingData] = useState<Form | null>(null);
   const { enriched, total, clear, subtotal, shipping, discount, coupon } = useCart();
-  const { user } = useAuth();
   const nav = useNavigate();
   const { register, handleSubmit, formState: { errors } } = useForm<Form>({ resolver: zodResolver(schema) });
 
@@ -49,9 +47,19 @@ export default function Checkout() {
   const placeOrder = async () => {
     if (!shippingData) return;
     setPlacing(true);
+
+    // Re-validate the session right before writing — a React-state `user` can go stale
+    // (token expired / not refreshed) while still looking "logged in" in the UI, which
+    // caused the client to send an authenticated user_id on an effectively-anonymous
+    // request and get rejected. getUser() re-checks with the server (refreshing if needed).
+    const { data: userRes } = await supabase.auth.getUser();
+    const effectiveUserId = userRes?.user?.id ?? null;
+
+    const orderId = crypto.randomUUID();
     const generatedNumber = "TZ-" + Math.floor(Math.random() * 900000 + 100000);
-    const { data: order, error } = await supabase.from("orders").insert({
-      user_id: user?.id ?? null,
+    const { error } = await supabase.from("orders").insert({
+      id: orderId,
+      user_id: effectiveUserId,
       order_number: generatedNumber,
       email: shippingData.email,
       phone: shippingData.phone,
@@ -60,11 +68,15 @@ export default function Checkout() {
       payment_method: pay,
       shipping_address: shippingData,
       status: "placed",
-    }).select().single();
-    if (error || !order) { toast.error(error?.message ?? "Failed to place order"); setPlacing(false); return; }
+    });
+    // Note: no .select() here on purpose — guest orders (user_id null) can be written
+    // but can't be read back under RLS (no SELECT policy covers anonymous guest orders,
+    // and rightly so — it would let anyone enumerate other guests' names/addresses).
+    // Generating the id client-side means we never need the row back.
+    if (error) { toast.error(error.message ?? "Failed to place order"); setPlacing(false); return; }
 
     const items = enriched.map(({ item, product }) => ({
-      order_id: order.id,
+      order_id: orderId,
       product_id: product.id,
       product_slug: product.slug,
       product_name: product.name,
@@ -77,11 +89,11 @@ export default function Checkout() {
     await supabase.from("order_items").insert(items);
 
     // Fire-and-forget order confirmation email — never block checkout success on this.
-    supabase.functions.invoke("send-order-confirmation", { body: { order_id: order.id } }).catch((e) => {
+    supabase.functions.invoke("send-order-confirmation", { body: { order_id: orderId } }).catch((e) => {
       console.error("send-order-confirmation failed:", e);
     });
 
-    setOrderNo(order.order_number);
+    setOrderNo(generatedNumber);
     clear();
     setStep(3);
     setPlacing(false);
