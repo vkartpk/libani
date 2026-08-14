@@ -11,7 +11,9 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { formatPKR } from "@/lib/storage";
+import { PK_PROVINCES, PK_CITIES } from "@/data/pakistanLocations";
 import { Check } from "lucide-react";
 import { toast } from "sonner";
 
@@ -19,11 +21,10 @@ const schema = z.object({
   fullName: z.string().trim().min(2).max(100),
   email: z.string().trim().email().max(255),
   phone: z.string().regex(/^03\d{2}-?\d{7}$/, "Use 03XX-XXXXXXX format"),
+  province: z.string().trim().min(2, "Select a province"),
+  city: z.string().trim().min(2, "Select or enter a city"),
   address1: z.string().trim().min(5).max(200),
   address2: z.string().max(200).optional(),
-  city: z.string().trim().min(2).max(80),
-  province: z.string().trim().min(2).max(80),
-  postal: z.string().trim().min(4).max(10),
   notes: z.string().max(500).optional(),
 });
 type Form = z.infer<typeof schema>;
@@ -34,9 +35,12 @@ export default function Checkout() {
   const [orderNo, setOrderNo] = useState("");
   const [placing, setPlacing] = useState(false);
   const [shippingData, setShippingData] = useState<Form | null>(null);
+  const [cityMode, setCityMode] = useState<"select" | "custom">("select");
   const { enriched, total, clear, subtotal, shipping, discount, coupon } = useCart();
   const nav = useNavigate();
-  const { register, handleSubmit, formState: { errors } } = useForm<Form>({ resolver: zodResolver(schema) });
+  const { register, handleSubmit, setValue, watch, formState: { errors } } = useForm<Form>({ resolver: zodResolver(schema) });
+  const selectedProvince = watch("province");
+  const cityOptions = selectedProvince ? (PK_CITIES[selectedProvince] || []) : [];
 
   if (enriched.length === 0 && step !== 3) {
     return <div className="container-x py-12 text-center"><p>Your cart is empty.</p><Button asChild className="mt-4"><Link to="/products">Shop now</Link></Button></div>;
@@ -124,11 +128,58 @@ export default function Checkout() {
                   <div><Label>Full name</Label><Input {...register("fullName")} />{errors.fullName && <p className="text-xs text-destructive mt-1">{errors.fullName.message}</p>}</div>
                   <div><Label>Email</Label><Input type="email" {...register("email")} />{errors.email && <p className="text-xs text-destructive mt-1">{errors.email.message}</p>}</div>
                   <div><Label>Phone (03XX-XXXXXXX)</Label><Input {...register("phone")} />{errors.phone && <p className="text-xs text-destructive mt-1">{errors.phone.message}</p>}</div>
-                  <div><Label>City</Label><Input {...register("city")} />{errors.city && <p className="text-xs text-destructive mt-1">{errors.city.message}</p>}</div>
+                  <div>
+                    <Label>Province</Label>
+                    <Select
+                      onValueChange={(v) => {
+                        setValue("province", v, { shouldValidate: true });
+                        setValue("city", "", { shouldValidate: false });
+                        setCityMode("select");
+                      }}
+                    >
+                      <SelectTrigger><SelectValue placeholder="Select province" /></SelectTrigger>
+                      <SelectContent>
+                        {PK_PROVINCES.map((p) => <SelectItem key={p} value={p}>{p}</SelectItem>)}
+                      </SelectContent>
+                    </Select>
+                    {errors.province && <p className="text-xs text-destructive mt-1">{errors.province.message}</p>}
+                  </div>
+                  <div>
+                    <Label>City</Label>
+                    {cityMode === "select" ? (
+                      <Select
+                        disabled={!selectedProvince}
+                        onValueChange={(v) => {
+                          if (v === "__other__") {
+                            setCityMode("custom");
+                            setValue("city", "", { shouldValidate: false });
+                          } else {
+                            setValue("city", v, { shouldValidate: true });
+                          }
+                        }}
+                      >
+                        <SelectTrigger><SelectValue placeholder={selectedProvince ? "Select city" : "Select province first"} /></SelectTrigger>
+                        <SelectContent>
+                          {cityOptions.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+                          <SelectItem value="__other__">Other (type manually)</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    ) : (
+                      <div className="flex gap-2">
+                        <Input placeholder="Enter city name" {...register("city")} />
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={() => { setCityMode("select"); setValue("city", "", { shouldValidate: false }); }}
+                        >
+                          Choose from list
+                        </Button>
+                      </div>
+                    )}
+                    {errors.city && <p className="text-xs text-destructive mt-1">{errors.city.message}</p>}
+                  </div>
                   <div className="sm:col-span-2"><Label>Address line 1</Label><Input {...register("address1")} />{errors.address1 && <p className="text-xs text-destructive mt-1">{errors.address1.message}</p>}</div>
                   <div className="sm:col-span-2"><Label>Address line 2 (optional)</Label><Input {...register("address2")} /></div>
-                  <div><Label>Province</Label><Input {...register("province")} />{errors.province && <p className="text-xs text-destructive mt-1">{errors.province.message}</p>}</div>
-                  <div><Label>Postal code</Label><Input {...register("postal")} />{errors.postal && <p className="text-xs text-destructive mt-1">{errors.postal.message}</p>}</div>
                   <div className="sm:col-span-2"><Label>Order notes (optional)</Label><Input {...register("notes")} /></div>
                 </div>
                 <Button type="submit" className="bg-primary hover:bg-primary/90 text-primary-foreground">Continue to payment</Button>
