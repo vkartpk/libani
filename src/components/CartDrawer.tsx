@@ -29,7 +29,7 @@ export function CartDrawer() {
               Delivery charges <span className="text-foreground font-semibold">{formatPKR(Number(settings.shipping_fee || 0))}</span> · payable on delivery
             </div>
 
-            <div className="flex-1 overflow-y-auto -mx-6 px-6 divide-y divide-border">
+            <div className="flex-1 min-h-0 overflow-y-auto -mx-6 px-6 divide-y divide-border">
               {enriched.map(({ item, product }) => (
                 <div key={`${item.productId}-${item.variantId ?? ""}`} className="py-4 flex gap-3">
                   <img src={product.images[0]} alt={product.name} className="h-16 w-16 rounded object-cover bg-surface" loading="lazy" />
