@@ -109,7 +109,27 @@ export default function AdminOrders() {
                 </div>
                 <div>
                   <div className="text-muted-foreground mb-1">Shipping address</div>
-                  <pre className="whitespace-pre-wrap text-xs bg-muted p-2 rounded">{JSON.stringify(open.shipping_address, null, 2)}</pre>
+                  <div className="bg-muted rounded p-3 space-y-2">
+                    <div className="font-medium">{open.shipping_address?.fullName}</div>
+                    <div className="grid grid-cols-2 gap-x-3 gap-y-1 text-xs">
+                      <div><span className="text-muted-foreground">Email: </span>{open.shipping_address?.email}</div>
+                      <div><span className="text-muted-foreground">Phone: </span>{open.shipping_address?.phone}</div>
+                    </div>
+                    <div className="text-xs pt-1 border-t border-border/60">
+                      <div>{open.shipping_address?.address1}</div>
+                      {open.shipping_address?.address2 && <div>{open.shipping_address.address2}</div>}
+                      <div>
+                        {[open.shipping_address?.city, open.shipping_address?.province, open.shipping_address?.postal]
+                          .filter(Boolean)
+                          .join(", ")}
+                      </div>
+                    </div>
+                    {open.shipping_address?.notes && (
+                      <div className="text-xs pt-1 border-t border-border/60">
+                        <span className="text-muted-foreground">Notes: </span>{open.shipping_address.notes}
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             </>
