@@ -9,6 +9,13 @@ import { toast } from "sonner";
 
 const STATUSES = ["placed", "processing", "shipped", "out_for_delivery", "delivered", "cancelled"];
 
+const SITE_ORIGIN = "https://libani.pk";
+function imgUrl(src?: string | null) {
+  if (!src) return null;
+  if (/^https?:\/\//i.test(src)) return src;
+  return `${SITE_ORIGIN}${src.startsWith("/") ? "" : "/"}${src}`;
+}
+
 export default function AdminOrders() {
   const [orders, setOrders] = useState<any[]>([]);
   const [filter, setFilter] = useState<string>("all");
@@ -100,11 +107,34 @@ export default function AdminOrders() {
                   <div className="text-muted-foreground mb-1">Items</div>
                   <div className="space-y-2">
                     {items.map(it => (
-                      <div key={it.id} className="flex justify-between border-b py-2">
-                        <div>{it.product_name} {it.variant_label && `(${it.variant_label})`} × {it.quantity}</div>
-                        <div>Rs {Number(it.line_total).toLocaleString()}</div>
+                      <div key={it.id} className="flex items-center gap-3 border-b py-2">
+                        {imgUrl(it.product_image) ? (
+                          <img
+                            src={imgUrl(it.product_image)!}
+                            alt={it.product_name}
+                            className="h-12 w-12 rounded object-cover border border-border shrink-0 bg-muted"
+                          />
+                        ) : (
+                          <div className="h-12 w-12 rounded bg-muted shrink-0" />
+                        )}
+                        <div className="flex-1 min-w-0">
+                          <div className="truncate font-medium">{it.product_name}{it.variant_label && ` (${it.variant_label})`}</div>
+                          <div className="text-xs text-muted-foreground">
+                            {it.product_sku && <>SKU: {it.product_sku} · </>}Qty {it.quantity}
+                          </div>
+                        </div>
+                        <div className="text-right shrink-0">Rs {Number(it.line_total).toLocaleString()}</div>
                       </div>
                     ))}
+                    {!items.length && <div className="text-xs text-muted-foreground py-2">No items found for this order</div>}
+                  </div>
+                  <div className="mt-2 rounded bg-muted p-3 text-xs space-y-1">
+                    <div className="flex justify-between"><span className="text-muted-foreground">Subtotal</span><span>Rs {Number(open.subtotal).toLocaleString()}</span></div>
+                    <div className="flex justify-between"><span className="text-muted-foreground">Shipping</span><span>Rs {Number(open.shipping).toLocaleString()}</span></div>
+                    {Number(open.discount) > 0 && (
+                      <div className="flex justify-between"><span className="text-muted-foreground">Discount</span><span>-Rs {Number(open.discount).toLocaleString()}</span></div>
+                    )}
+                    <div className="flex justify-between font-semibold pt-1 border-t border-border/60"><span>Total</span><span>Rs {Number(open.total).toLocaleString()}</span></div>
                   </div>
                 </div>
                 <div>
