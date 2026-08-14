@@ -30,25 +30,27 @@ export default function AdminDashboard() {
   }, []);
 
   const cards = [
-    { label: "Total Orders", value: stats.orders.toLocaleString(), icon: ShoppingBag },
-    { label: "Revenue (30d)", value: `Rs ${stats.revenue.toLocaleString()}`, icon: DollarSign },
-    { label: "Products", value: stats.products.toLocaleString(), icon: Package },
-    { label: "Customers", value: stats.customers.toLocaleString(), icon: Users },
+    { label: "Total Orders", value: stats.orders.toLocaleString(), icon: ShoppingBag, to: "/libani/orders" },
+    { label: "Revenue (30d)", value: `Rs ${stats.revenue.toLocaleString()}`, icon: DollarSign, to: "/libani/finance" },
+    { label: "Products", value: stats.products.toLocaleString(), icon: Package, to: "/libani/products" },
+    { label: "Customers", value: stats.customers.toLocaleString(), icon: Users, to: "/libani/customers" },
   ];
 
   return (
     <AdminLayout title="Dashboard">
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         {cards.map((c) => (
-          <Card key={c.label} className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <div className="text-xs text-muted-foreground">{c.label}</div>
-                <div className="text-2xl font-bold mt-1">{c.value}</div>
+          <Link key={c.label} to={c.to}>
+            <Card className="p-4 transition-colors hover:border-primary/50 hover:bg-card/80 cursor-pointer">
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="text-xs text-muted-foreground">{c.label}</div>
+                  <div className="text-2xl font-bold mt-1">{c.value}</div>
+                </div>
+                <c.icon className="h-6 w-6 text-primary" />
               </div>
-              <c.icon className="h-6 w-6 text-primary" />
-            </div>
-          </Card>
+            </Card>
+          </Link>
         ))}
       </div>
       <Card className="p-4">
