@@ -18,14 +18,17 @@ export default function TrackOrder() {
   const lookup = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    const { data } = await supabase.from("orders").select("*").eq("order_number", num.trim()).maybeSingle();
+    const { data, error } = await supabase.rpc("track_order", {
+      p_order_number: num.trim(),
+      p_contact: contact.trim(),
+    });
     setLoading(false);
-    if (!data) { toast.error("Order not found"); setOrder(null); return; }
-    const c = contact.trim().toLowerCase();
-    if (data.email.toLowerCase() !== c && data.phone.replace(/\s|-/g, "") !== c.replace(/\s|-/g, "")) {
-      toast.error("Email or phone doesn't match"); setOrder(null); return;
+    if (error || !data || !data.length) {
+      toast.error("Order not found, or email/phone doesn't match");
+      setOrder(null);
+      return;
     }
-    setOrder(data);
+    setOrder(data[0]);
   };
 
   const statusOrder = ["placed","processing","shipped","out_for_delivery","delivered"];
