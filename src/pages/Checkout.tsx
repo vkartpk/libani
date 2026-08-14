@@ -76,6 +76,11 @@ export default function Checkout() {
     }));
     await supabase.from("order_items").insert(items);
 
+    // Fire-and-forget order confirmation email — never block checkout success on this.
+    supabase.functions.invoke("send-order-confirmation", { body: { order_id: order.id } }).catch((e) => {
+      console.error("send-order-confirmation failed:", e);
+    });
+
     setOrderNo(order.order_number);
     clear();
     setStep(3);
