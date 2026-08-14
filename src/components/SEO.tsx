@@ -12,7 +12,7 @@ type Props = {
 
 export function SEO({ title, description, image, type = "website", canonical, jsonLd, faq }: Props) {
   const url = canonical ?? (typeof window !== "undefined" ? window.location.href : "");
-  const ogImage = image ?? "https://libani.pk/og-image.png";
+  const ogImage = image ?? "https://libani.pk/og-image-v2.png";
   const ldArray = Array.isArray(jsonLd) ? jsonLd : jsonLd ? [jsonLd] : [];
   if (faq && faq.length) {
     ldArray.push({
