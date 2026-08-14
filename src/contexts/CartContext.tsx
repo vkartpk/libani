@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useMemo, useState, ReactNode } from "react";
 import { safeStorage } from "@/lib/storage";
-import { products } from "@/data/products";
+import { products, subscribeProducts, hydrateProductsFromDb } from "@/data/products";
 import type { Product } from "@/data/types";
 import { useSiteSettings } from "@/hooks/useSiteSettings";
 import { supabase } from "@/lib/supabase";
@@ -44,6 +44,22 @@ export function CartProvider({ children }: { children: ReactNode }) {
   useEffect(() => safeStorage.set(KEY, items), [items]);
   useEffect(() => safeStorage.set(COUPON_KEY, coupon), [coupon]);
 
+  // `products` is a mutable module-level array: it starts as static seed data
+  // and gets swapped for the live Supabase catalogue asynchronously (see
+  // hydrateProductsFromDb / ProductsHydrator). CartProvider sits ABOVE
+  // ProductsHydrator in the tree, so its own re-renders don't get triggered
+  // when that hydration finishes — meaning `enriched` below could stay
+  // memoized against the stale/empty seed data forever (cart badge shows a
+  // count, but the drawer renders "empty" until some unrelated `items`
+  // change forces a recompute). Subscribing here directly guarantees the
+  // cart re-resolves products as soon as the live catalogue is in.
+  const [productsTick, setProductsTick] = useState(0);
+  useEffect(() => {
+    const unsub = subscribeProducts(() => setProductsTick((v) => v + 1));
+    hydrateProductsFromDb();
+    return unsub;
+  }, []);
+
   const add: CartCtx["add"] = (productId, qty = 1, variantId) =>
     setItems((cur) => {
       const idx = cur.findIndex((i) => i.productId === productId && i.variantId === variantId);
@@ -77,7 +93,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
           return product ? { item, product } : null;
         })
         .filter(Boolean) as { item: CartItem; product: Product }[],
-    [items],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [items, productsTick],
   );
 
   const subtotal = enriched.reduce((acc, { item, product }) => acc + product.price * item.qty, 0);
